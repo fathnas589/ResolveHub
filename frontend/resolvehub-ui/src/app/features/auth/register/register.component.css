@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background: radial-gradient(circle at 50% 20%, #0A1830 0%, #061225 100%);
   padding: 2.5rem 1rem;
   box-sizing: border-box;
 }
@@ -27,13 +27,13 @@
 .brand-logo {
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  background: linear-gradient(135deg, #3478F6, #8955F6);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(52, 120, 246, 0.45);
   margin-bottom: 0.75rem;
 }
 
@@ -46,23 +46,23 @@
   margin: 0;
   font-size: 1.875rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-primary, #F4F7FF);
   letter-spacing: -0.03em;
 }
 
 .brand-tagline {
   margin: 0.25rem 0 0 0;
   font-size: 0.875rem;
-  color: #94a3b8;
+  color: var(--text-muted, #7487A4);
 }
 
 /* Register Card */
 .register-card {
-  background: #ffffff;
+  background: var(--bg-surface, #0D1D36);
   border-radius: 16px;
   padding: 2.25rem;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.25);
-  border: 1px solid #f1f5f9;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color, #1D3557);
 }
 
 .card-header-group {
@@ -73,26 +73,26 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary, #F4F7FF);
 }
 
 .card-subheading {
   margin: 0.35rem 0 0 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-muted, #7487A4);
 }
 
 /* Role Info Banner */
 .role-badge-banner {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: rgba(52, 120, 246, 0.12);
+  border: 1px solid rgba(52, 120, 246, 0.3);
   border-radius: 10px;
   padding: 0.85rem 1rem;
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
   font-size: 0.8125rem;
-  color: #1e40af;
+  color: #72a3fe;
   line-height: 1.45;
   margin-bottom: 1.5rem;
 }
@@ -101,7 +101,7 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #2563eb;
+  color: var(--accent-blue, #3478F6);
   margin-top: 1px;
 }
 
@@ -124,9 +124,9 @@
 }
 
 .alert-danger {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: rgba(255, 82, 104, 0.15);
+  color: #ff7e8e;
+  border: 1px solid rgba(255, 82, 104, 0.3);
 }
 
 /* Forms */
@@ -151,39 +151,38 @@
 .form-label {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--text-secondary, #A9B9D2);
 }
 
 .form-label .required {
-  color: #ef4444;
+  color: var(--accent-danger, #FF5268);
 }
 
 .form-label .optional {
-  color: #94a3b8;
+  color: var(--text-muted, #7487A4);
   font-weight: 400;
   font-size: 0.75rem;
 }
 
 .form-control {
   padding: 0.65rem 0.875rem;
-  border: 1.5px solid #cbd5e1;
+  border: 1.5px solid var(--border-color, #1D3557);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #0f172a;
-  background: #f8fafc;
+  color: var(--text-primary, #F4F7FF);
+  background: var(--bg-elevated, #112442);
   transition: all 0.15s ease;
   box-sizing: border-box;
 }
 
 .form-control:focus {
   outline: none;
-  background: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: var(--accent-blue, #3478F6);
+  box-shadow: 0 0 0 3px rgba(52, 120, 246, 0.2);
 }
 
 .form-control::placeholder {
-  color: #94a3b8;
+  color: var(--text-muted, #7487A4);
 }
 
 /* Submit Button */
@@ -194,21 +193,21 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.8rem 1.25rem;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #3478F6 0%, #8955F6 100%);
   color: #ffffff;
   border: none;
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 14px rgba(52, 120, 246, 0.35);
   transition: all 0.15s ease;
   margin-top: 0.5rem;
 }
 
 .btn-submit:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+  background: linear-gradient(135deg, #2b63cb 0%, #7544d8 100%);
+  box-shadow: 0 6px 18px rgba(52, 120, 246, 0.45);
   transform: translateY(-1px);
 }
 
@@ -243,18 +242,18 @@
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-muted, #7487A4);
 }
 
 .login-link {
-  color: #2563eb;
+  color: var(--accent-blue, #3478F6);
   font-weight: 600;
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .login-link:hover {
-  color: #1d4ed8;
+  color: #72a3fe;
   text-decoration: underline;
 }
 
@@ -262,7 +261,7 @@
 .register-footer {
   text-align: center;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted, #7487A4);
 }
 
 @media (max-width: 520px) {
@@ -283,15 +282,15 @@
 .success-icon-badge {
   width: 64px;
   height: 64px;
-  background: #ecfdf5;
-  color: #059669;
+  background: rgba(36, 214, 160, 0.15);
+  color: var(--accent-success, #24D6A0);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.25rem;
-  border: 2px solid #a7f3d0;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+  border: 2px solid rgba(36, 214, 160, 0.3);
+  box-shadow: 0 4px 14px rgba(36, 214, 160, 0.25);
 }
 
 .success-icon-badge svg {
@@ -301,8 +300,8 @@
 
 .approval-notice-card {
   margin: 1.5rem 0;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
+  background: rgba(245, 185, 66, 0.12);
+  border: 1px solid rgba(245, 185, 66, 0.3);
   border-radius: 12px;
   padding: 1.25rem;
   display: flex;
@@ -312,7 +311,7 @@
 }
 
 .notice-icon {
-  color: #d97706;
+  color: var(--accent-warning, #F5B942);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -325,14 +324,14 @@
 .notice-text strong {
   display: block;
   font-size: 0.95rem;
-  color: #92400e;
+  color: #f7ca6d;
   margin-bottom: 0.25rem;
 }
 
 .notice-text p {
   margin: 0;
   font-size: 0.85rem;
-  color: #b45309;
+  color: #ffe6a3;
   line-height: 1.5;
 }
 

@@ -23,15 +23,15 @@
 
 .page-title {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #f8fafc;
+  font-weight: 800;
+  color: var(--text-primary, #F4F7FF);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
 .page-subtitle {
   font-size: 0.875rem;
-  color: #94a3b8;
+  color: var(--text-muted, #7487A4);
   margin: 0.25rem 0 0;
 }
 
@@ -49,13 +49,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #3478F6 0%, #8955F6 100%);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 12px rgba(52, 120, 246, 0.35);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #2b63cb 0%, #7544d8 100%);
   transform: translateY(-1px);
 }
 
@@ -67,57 +67,58 @@
 }
 
 .priority-card {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-surface, #0D1D36);
+  border: 1px solid var(--border-color, #1D3557);
   border-radius: 14px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   transition: transform 0.15s, border-color 0.15s;
 }
 
 .priority-card:hover {
   transform: translateY(-2px);
+  border-color: rgba(52, 120, 246, 0.5);
 }
 
 /* Color Themes per Priority */
 .badge-urgent {
-  border-top: 4px solid #ef4444;
+  border-top: 4px solid var(--accent-danger, #FF5268);
 }
 .badge-urgent .p-badge {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(255, 82, 104, 0.15);
+  color: #ff7e8e;
+  border: 1px solid rgba(255, 82, 104, 0.3);
 }
 
 .badge-high {
-  border-top: 4px solid #f97316;
+  border-top: 4px solid var(--accent-warning, #F5B942);
 }
 .badge-high .p-badge {
-  background: rgba(249, 115, 22, 0.15);
-  color: #fb923c;
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  background: rgba(245, 185, 66, 0.15);
+  color: #f7ca6d;
+  border: 1px solid rgba(245, 185, 66, 0.3);
 }
 
 .badge-medium {
-  border-top: 4px solid #6366f1;
+  border-top: 4px solid var(--accent-blue, #3478F6);
 }
 .badge-medium .p-badge {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgba(52, 120, 246, 0.15);
+  color: #72a3fe;
+  border: 1px solid rgba(52, 120, 246, 0.3);
 }
 
 .badge-low {
-  border-top: 4px solid #10b981;
+  border-top: 4px solid var(--accent-success, #24D6A0);
 }
 .badge-low .p-badge {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(36, 214, 160, 0.15);
+  color: #5ce3bc;
+  border: 1px solid rgba(36, 214, 160, 0.3);
 }
 
 /* Card Header */
@@ -145,7 +146,7 @@
 .p-name {
   font-size: 1.0625rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary, #F4F7FF);
   margin: 0;
 }
 
@@ -153,7 +154,8 @@
   display: flex;
   align-items: baseline;
   gap: 0.25rem;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-elevated, #112442);
+  border: 1px solid var(--border-color, #1D3557);
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
   font-size: 0.75rem;
@@ -161,17 +163,17 @@
 
 .count-num {
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary, #F4F7FF);
 }
 
 .count-txt {
-  color: #94a3b8;
+  color: var(--text-muted, #7487A4);
   font-size: 0.6875rem;
 }
 
 .p-desc {
   font-size: 0.8125rem;
-  color: #94a3b8;
+  color: var(--text-secondary, #A9B9D2);
   line-height: 1.45;
   margin: 0 0 1rem;
   min-height: 2.5rem;
@@ -179,8 +181,8 @@
 
 /* Targets Box */
 .targets-box {
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-elevated, #112442);
+  border: 1px solid var(--border-color, #1D3557);
   border-radius: 10px;
   padding: 0.875rem 1rem;
   display: flex;
@@ -198,20 +200,20 @@
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #64748b;
+  color: var(--text-muted, #7487A4);
   margin-bottom: 0.2rem;
 }
 
 .target-val {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary, #F4F7FF);
 }
 
 .target-divider {
   width: 1px;
   height: 28px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border-color, #1D3557);
 }
 
 .escalation-notice {
@@ -220,8 +222,9 @@
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
-  background: rgba(245, 158, 11, 0.1);
-  color: #fbbf24;
+  background: rgba(245, 185, 66, 0.12);
+  color: var(--accent-warning, #F5B942);
+  border: 1px solid rgba(245, 185, 66, 0.25);
   font-size: 0.75rem;
   font-weight: 500;
   margin-bottom: 1.25rem;
@@ -243,7 +246,7 @@
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #64748b;
+  color: var(--text-muted, #7487A4);
   display: block;
   margin-bottom: 0.625rem;
 }
@@ -262,31 +265,31 @@
   align-items: flex-start;
   gap: 0.5rem;
   font-size: 0.8125rem;
-  color: #cbd5e1;
+  color: var(--text-secondary, #A9B9D2);
   line-height: 1.4;
 }
 
 .check-icon {
   width: 14px;
   height: 14px;
-  color: #818cf8;
+  color: var(--accent-blue, #3478F6);
   margin-top: 2px;
   flex-shrink: 0;
 }
 
 /* Card Footer */
 .card-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-color, #1D3557);
   padding-top: 1rem;
 }
 
 .view-tickets-btn {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(52, 120, 246, 0.08);
+  border: 1px solid var(--border-color, #1D3557);
   border-radius: 8px;
   padding: 0.5625rem 1rem;
-  color: #cbd5e1;
+  color: var(--text-primary, #F4F7FF);
   font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
@@ -298,7 +301,8 @@
 }
 
 .view-tickets-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(52, 120, 246, 0.18);
+  border-color: var(--accent-blue, #3478F6);
   color: #ffffff;
 }
 
@@ -309,11 +313,11 @@
 
 /* Matrix Card */
 .matrix-card {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-surface, #0D1D36);
+  border: 1px solid var(--border-color, #1D3557);
   border-radius: 14px;
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .matrix-header {
@@ -327,8 +331,9 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
+  background: rgba(52, 120, 246, 0.15);
+  border: 1px solid rgba(52, 120, 246, 0.3);
+  color: var(--accent-blue, #3478F6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,13 +347,13 @@
 .matrix-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary, #F4F7FF);
   margin: 0;
 }
 
 .matrix-subtitle {
   font-size: 0.8125rem;
-  color: #94a3b8;
+  color: var(--text-muted, #7487A4);
   margin: 0.2rem 0 0;
 }
 
@@ -363,20 +368,20 @@
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #94a3b8;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-secondary, #A9B9D2);
+  border-bottom: 1px solid var(--border-color, #1D3557);
+  background: var(--bg-elevated, #112442);
 }
 
 .matrix-table td {
   padding: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(29, 53, 87, 0.6);
 }
 
 .impact-col {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-primary, #F4F7FF);
 }
 
 .matrix-badge {
