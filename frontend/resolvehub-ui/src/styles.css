@@ -630,3 +630,17 @@ input, button, select, textarea {
 .alert-banner-close:hover {
   background-color: rgba(255, 82, 104, 0.15);
 }
+
+/* ==========================================================================
+   Global Icon & SVG Dimensions Safeguard
+   ========================================================================== */
+.search-box svg,
+.search-input-box svg,
+.toolbar-search svg,
+.search-icon {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+}
+
