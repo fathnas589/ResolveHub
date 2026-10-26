@@ -1,0 +1,184 @@
+<div class="user-dashboard-page">
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="header-left">
+      <span class="portal-badge">Employee Service Portal</span>
+      <h1 class="welcome-heading">Welcome back, {{ authService.currentUser()?.fullName || 'Requester' }}!</h1>
+      <p class="welcome-subtext">Track your service requests, submit new issues, and check real-time resolution progress.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/user/raise-ticket" class="btn btn-primary" id="btn-raise-ticket">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="10" y1="4" x2="10" y2="16"/>
+          <line x1="4" y1="10" x2="16" y2="10"/>
+        </svg>
+        <span>+ Raise Request</span>
+      </a>
+      <a routerLink="/user/tickets" class="btn btn-outline" id="btn-view-all-requests">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 6h12M4 10h12M4 14h8"/>
+        </svg>
+        <span>My Requests</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading your portal dashboard...</p>
+    </div>
+  } @else if (errorMessage) {
+    <!-- Error State -->
+    <div class="error-banner">
+      <div class="error-icon">⚠️</div>
+      <div class="error-text">
+        <strong>Error Loading Data</strong>
+        <p>{{ errorMessage }}</p>
+      </div>
+      <button class="btn btn-sm btn-outline" (click)="loadUserData()">Try Again</button>
+    </div>
+  } @else {
+    <!-- Personal KPI Cards Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card total-card">
+        <div class="kpi-icon-box total-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">My Total Requests</span>
+          <span class="kpi-value">{{ kpis.total }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card open-card">
+        <div class="kpi-icon-box open-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 14 14"/>
+          </svg>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Open / Pending Review</span>
+          <span class="kpi-value">{{ kpis.open }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card progress-card">
+        <div class="kpi-icon-box progress-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">In Progress / Assigned</span>
+          <span class="kpi-value">{{ kpis.inProgress }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card resolved-card">
+        <div class="kpi-icon-box resolved-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Resolved / Closed</span>
+          <span class="kpi-value">{{ kpis.resolvedClosed }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Requests Section -->
+    <div class="recent-requests-section">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h2 class="section-title">My Recent Requests</h2>
+          <span class="section-subtitle">Showing your 5 most recently created or updated tickets</span>
+        </div>
+        <a routerLink="/user/tickets" class="view-all-link">
+          <span>View All ({{ kpis.total }})</span>
+          <span class="arrow">&rarr;</span>
+        </a>
+      </div>
+
+      @if (recentTickets.length === 0) {
+        <div class="empty-state-card">
+          <div class="empty-icon">📂</div>
+          <h3>No Requests Yet</h3>
+          <p>You haven't submitted any complaints or service requests yet. If you are experiencing an issue or need assistance, submit your request below.</p>
+          <a routerLink="/user/raise-ticket" class="btn btn-primary btn-sm">
+            <span>Submit Your First Request</span>
+          </a>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="tickets-table">
+            <thead>
+              <tr>
+                <th>Ticket #</th>
+                <th>Subject</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Created</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ticket of recentTickets; track ticket.gId) {
+                <tr class="ticket-row" (click)="viewTicketDetails(ticket.gId)">
+                  <td class="font-mono font-semibold text-primary">
+                    {{ ticket.ticketNumber }}
+                  </td>
+                  <td class="subject-cell">
+                    <span class="subject-text" [title]="ticket.subject">{{ ticket.subject }}</span>
+                    <span class="type-badge">{{ ticket.ticketType }}</span>
+                  </td>
+                  <td class="text-muted">
+                    {{ ticket.categoryName || ticket.departmentName }}
+                  </td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getStatusBadgeClass(ticket.status)">
+                      {{ ticket.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="priority-badge" [ngClass]="getPriorityBadgeClass(ticket.priority)">
+                      {{ ticket.priority }}
+                    </span>
+                  </td>
+                  <td class="text-muted text-sm">
+                    {{ ticket.created | date:'mediumDate' }}
+                  </td>
+                  <td class="text-right" (click)="$event.stopPropagation()">
+                    <button class="btn btn-sm btn-ghost" (click)="viewTicketDetails(ticket.gId)" title="View Details">
+                      View &rarr;
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Detail Drawer Modal -->
+  @if (selectedTicketGId) {
+    <app-ticket-detail
+      [ticketGId]="selectedTicketGId"
+      (close)="closeTicketDrawer()"
+      (ticketUpdated)="onTicketUpdated()"
+    />
+  }
+</div>

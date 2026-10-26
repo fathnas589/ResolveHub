@@ -1,0 +1,256 @@
+<div class="dashboard-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left-col">
+      <h1 class="page-title">Operations & SLA Dashboard</h1>
+      <p class="page-subtitle">Real-time service desk metrics, SLA compliance health, and live workload pipeline</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-secondary" (click)="loadMetrics()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        <span>Refresh</span>
+      </button>
+      <button type="button" class="btn btn-primary" (click)="createTicket()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 5v10M5 10h10"/>
+        </svg>
+        <span>Create Ticket</span>
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Aggregating enterprise operations metrics...</p>
+    </div>
+  } @else if (metrics) {
+    <!-- KPI Metric Cards Grid -->
+    <div class="kpi-grid">
+      <!-- Open Tickets -->
+      <div class="kpi-card" (click)="viewAllTickets()">
+        <div class="kpi-icon-box kpi-blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">OPEN TICKETS</span>
+          <span class="kpi-value">{{ metrics.summary.openTickets }}</span>
+        </div>
+      </div>
+
+      <!-- In Progress -->
+      <div class="kpi-card" (click)="viewAllTickets()">
+        <div class="kpi-icon-box kpi-purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">IN PROGRESS</span>
+          <span class="kpi-value">{{ metrics.summary.inProgressTickets }}</span>
+        </div>
+      </div>
+
+      <!-- Resolved Today -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-emerald">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">RESOLVED TODAY</span>
+          <span class="kpi-value">{{ metrics.summary.resolvedToday }}</span>
+        </div>
+      </div>
+
+      <!-- SLA Breaches -->
+      <div class="kpi-card" [class.alert-glow]="metrics.summary.breachedTickets > 0" (click)="viewBreachedTickets()">
+        <div class="kpi-icon-box kpi-rose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">SLA BREACHES</span>
+          <span class="kpi-value text-rose">{{ metrics.summary.breachedTickets }}</span>
+        </div>
+      </div>
+
+      <!-- SLA Warnings -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">SLA AT RISK</span>
+          <span class="kpi-value text-amber">{{ metrics.summary.warningTickets }}</span>
+        </div>
+      </div>
+
+      <!-- Avg Response Time -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-indigo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">AVG RESPONSE TIME</span>
+          <span class="kpi-value">{{ metrics.summary.avgResponseHours | number:'1.1-1' }}h</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics & Breakdown Row -->
+    <div class="dashboard-charts-grid">
+      <!-- Priority Distribution -->
+      <div class="chart-card">
+        <div class="card-header-clean">
+          <h3 class="card-title">Tickets by Priority</h3>
+          <span class="card-subtitle">{{ metrics.summary.totalTickets }} total requests</span>
+        </div>
+        <div class="distribution-list">
+          @for (p of metrics.priorityBreakdown; track p.name) {
+            <div class="dist-row">
+              <div class="dist-labels">
+                <span class="dist-name">{{ p.name }}</span>
+                <span class="dist-count">{{ p.count }}</span>
+              </div>
+              <div class="progress-track">
+                <div
+                  class="progress-bar"
+                  [style.width.%]="metrics.summary.totalTickets > 0 ? (p.count / metrics.summary.totalTickets * 100) : 0"
+                  [style.background]="getPriorityColor(p.name)"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Status Pipeline -->
+      <div class="chart-card">
+        <div class="card-header-clean">
+          <h3 class="card-title">Workflow Status Pipeline</h3>
+          <span class="card-subtitle">Active ticket distribution</span>
+        </div>
+        <div class="distribution-list">
+          @for (s of metrics.statusBreakdown; track s.name) {
+            <div class="dist-row">
+              <div class="dist-labels">
+                <span class="dist-name">{{ s.name }}</span>
+                <span class="dist-count">{{ s.count }}</span>
+              </div>
+              <div class="progress-track">
+                <div
+                  class="progress-bar"
+                  [style.width.%]="metrics.summary.totalTickets > 0 ? (s.count / metrics.summary.totalTickets * 100) : 0"
+                  [style.background]="getStatusColor(s.name)"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Department Distribution -->
+      <div class="chart-card">
+        <div class="card-header-clean">
+          <h3 class="card-title">Department Workload</h3>
+          <span class="card-subtitle">Volume across business units</span>
+        </div>
+        <div class="distribution-list">
+          @for (d of metrics.departmentBreakdown; track d.name) {
+            <div class="dist-row">
+              <div class="dist-labels">
+                <span class="dist-name">{{ d.name }}</span>
+                <span class="dist-count">{{ d.count }}</span>
+              </div>
+              <div class="progress-track">
+                <div
+                  class="progress-bar"
+                  [style.width.%]="metrics.summary.totalTickets > 0 ? (d.count / metrics.summary.totalTickets * 100) : 0"
+                  style="background: #3b82f6;"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Tickets Feed -->
+    <div class="recent-tickets-card">
+      <div class="card-header-clean flex-between">
+        <div>
+          <h3 class="card-title">Recent Tickets & Requests</h3>
+          <span class="card-subtitle">Latest operations queue updates</span>
+        </div>
+        <button type="button" class="link-btn" (click)="viewAllTickets()">
+          View All Tickets &rarr;
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>TICKET</th>
+              <th>SUBJECT</th>
+              <th>PRIORITY</th>
+              <th>DEPARTMENT</th>
+              <th>ASSIGNED TO</th>
+              <th>STATUS</th>
+              <th>CREATED</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of metrics.recentTickets; track t.gId) {
+              <tr class="ticket-row" (click)="viewTicket(t.gId)">
+                <td class="ticket-num-col">
+                  <span class="num-chip">{{ t.ticketNumber }}</span>
+                </td>
+                <td class="subject-col">
+                  <span class="subject-text">{{ t.subject }}</span>
+                </td>
+                <td>
+                  <span class="p-badge" [attr.data-priority]="t.priority">{{ t.priority }}</span>
+                </td>
+                <td>
+                  <span class="dept-text">{{ t.departmentName }}</span>
+                </td>
+                <td>
+                  <span class="agent-text">{{ t.assignedToName }}</span>
+                </td>
+                <td>
+                  <span class="status-badge" [attr.data-status]="t.status">{{ t.status }}</span>
+                </td>
+                <td class="time-text">
+                  {{ t.created | date:'shortTime' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

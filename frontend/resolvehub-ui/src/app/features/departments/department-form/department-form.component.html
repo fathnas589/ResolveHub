@@ -1,0 +1,137 @@
+<div class="modal-backdrop" (click)="onCancel()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-header-text">
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Department' : 'Add Department' }}</h2>
+        <p class="modal-subtitle">
+          {{ isEditMode ? 'Update department information and routing status.' : 'Create a new organizational department for complaint routing.' }}
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn-close-modal"
+        (click)="onCancel()"
+        aria-label="Close dialog"
+      >
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="5" y1="5" x2="15" y2="15"/>
+          <line x1="15" y1="5" x2="5" y2="15"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Inline Error Alert -->
+    @if (errorMessage) {
+      <div class="form-alert form-alert-error" role="alert">
+        <svg class="alert-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="10" cy="10" r="7"/>
+          <line x1="10" y1="7" x2="10" y2="10"/>
+          <line x1="10" y1="13" x2="10.01" y2="13"/>
+        </svg>
+        <span class="alert-text">{{ errorMessage }}</span>
+      </div>
+    }
+
+    <!-- Form Content -->
+    <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="modal-body">
+        <!-- Department Name Field -->
+        <div class="form-field">
+          <label for="departmentName" class="field-label">
+            Department Name <span class="required-star">*</span>
+          </label>
+          <input
+            id="departmentName"
+            type="text"
+            class="form-input"
+            [class.has-error]="nameControl.invalid && (nameControl.dirty || nameControl.touched)"
+            formControlName="departmentName"
+            placeholder="e.g. Billing, Technical Support, Operations"
+            maxlength="100"
+            autocomplete="off"
+          />
+          <div class="field-footer">
+            @if (nameControl.invalid && (nameControl.dirty || nameControl.touched)) {
+              <span class="field-error">
+                @if (nameControl.errors?.['required']) {
+                  Department name is required.
+                } @else if (nameControl.errors?.['maxlength']) {
+                  Maximum 100 characters allowed.
+                }
+              </span>
+            } @else {
+              <span class="field-hint">Unique name within your organization</span>
+            }
+          </div>
+        </div>
+
+        <!-- Description Field -->
+        <div class="form-field">
+          <label for="description" class="field-label">
+            Description <span class="optional-tag">(Optional)</span>
+          </label>
+          <textarea
+            id="description"
+            rows="3"
+            class="form-textarea"
+            [class.has-error]="descriptionControl.invalid && (descriptionControl.dirty || descriptionControl.touched)"
+            formControlName="description"
+            placeholder="Briefly describe the responsibilities and ticket routing for this department..."
+            maxlength="500"
+          ></textarea>
+          <div class="field-footer">
+            @if (descriptionControl.invalid && (descriptionControl.dirty || descriptionControl.touched)) {
+              <span class="field-error">Maximum 500 characters allowed.</span>
+            } @else {
+              <span class="field-hint">Helps staff understand ticket assignment scope</span>
+            }
+          </div>
+        </div>
+
+        <!-- Professional Status Toggle Switch -->
+        <div class="toggle-card">
+          <div class="toggle-info">
+            <span class="toggle-title">Active Department</span>
+            <span class="toggle-description">
+              Available for ticket creation, routing rules, and user assignment
+            </span>
+          </div>
+          <label class="toggle-switch" for="isActive">
+            <input
+              id="isActive"
+              type="checkbox"
+              formControlName="isActive"
+              aria-label="Department active toggle"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-ghost"
+          (click)="onCancel()"
+          [disabled]="isSubmitting"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="departmentForm.invalid || isSubmitting"
+        >
+          @if (isSubmitting) {
+            <span class="btn-spinner"></span>
+            <span>Saving...</span>
+          } @else {
+            <span>{{ isEditMode ? 'Save Changes' : 'Create Department' }}</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

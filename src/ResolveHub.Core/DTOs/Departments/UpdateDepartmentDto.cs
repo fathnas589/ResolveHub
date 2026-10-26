@@ -1,0 +1,8 @@
+namespace ResolveHub.Core.DTOs.Departments;
+
+public class UpdateDepartmentDto
+{
+    public string DepartmentName { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public bool IsActive { get; set; } = true;
+}

@@ -1,0 +1,95 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3 class="modal-title">Assign Ticket</h3>
+        <span class="ticket-tag">{{ ticket.ticketNumber }}</span>
+      </div>
+      <button type="button" class="btn-close" (click)="close.emit()" aria-label="Close modal">&times;</button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+
+      <div class="ticket-summary-box">
+        <div class="summary-line">
+          <span class="summary-label">Subject:</span>
+          <span class="summary-value">{{ ticket.subject }}</span>
+        </div>
+        <div class="summary-line">
+          <span class="summary-label">Department:</span>
+          <span class="summary-value">{{ ticket.departmentName }}</span>
+        </div>
+        <div class="summary-line">
+          <span class="summary-label">Current Assignee:</span>
+          <span class="summary-value">{{ ticket.assignedToFullName || 'Unassigned' }}</span>
+        </div>
+      </div>
+
+      <!-- Agent Selection Dropdown -->
+      <div class="form-group">
+        <label for="agentSelect" class="form-label">
+          Select Agent <span class="text-danger">*</span>
+        </label>
+        @if (isLoadingAgents) {
+          <div class="loading-state">Loading department agents...</div>
+        } @else {
+          <select
+            id="agentSelect"
+            class="form-control"
+            [(ngModel)]="selectedAgentGId"
+            [disabled]="isSubmitting"
+          >
+            <option value="" disabled>-- Choose an Agent from {{ ticket.departmentName }} --</option>
+            @for (agent of agents; track agent.gId) {
+              <option [value]="agent.gId">
+                {{ agent.fullName }} ({{ agent.userName }})
+              </option>
+            }
+          </select>
+          @if (agents.length === 0) {
+            <small class="text-muted text-warning">
+              No active agents found in {{ ticket.departmentName }}.
+            </small>
+          }
+        }
+      </div>
+
+      <!-- Optional Assignment Notes -->
+      <div class="form-group">
+        <label for="assignNotes" class="form-label">Assignment Notes (Optional)</label>
+        <textarea
+          id="assignNotes"
+          class="form-control textarea"
+          rows="3"
+          [(ngModel)]="comments"
+          placeholder="Add instructions or handover remarks for the agent..."
+          [disabled]="isSubmitting"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="close.emit()" [disabled]="isSubmitting">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="submit()"
+        [disabled]="isSubmitting || !selectedAgentGId"
+      >
+        @if (isSubmitting) {
+          <span>Assigning...</span>
+        } @else {
+          <span>Confirm Assignment</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

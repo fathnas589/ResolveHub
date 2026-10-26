@@ -1,0 +1,178 @@
+<div class="register-page">
+  <div class="register-wrapper">
+    <!-- Brand / Header -->
+    <div class="register-brand-header">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">ResolveHub</h1>
+      <p class="brand-tagline">Self-Service Helpdesk Portal</p>
+    </div>
+
+    <!-- Registration Card -->
+    <div class="register-card">
+      @if (isRegistered) {
+        <!-- Post-Registration Success / Pending Approval State -->
+        <div class="registration-success-state">
+          <div class="success-icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 class="card-heading">Registration Submitted!</h2>
+          <p class="card-subheading">Thank you, <strong>{{ registeredName }}</strong>. Your account has been registered.</p>
+
+          <div class="approval-notice-card">
+            <div class="notice-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="notice-text">
+              <strong>Pending Administrator Approval</strong>
+              <p>For security, new accounts require activation by an administrator before sign in is enabled. Once approved, you can log in immediately.</p>
+            </div>
+          </div>
+
+          <div class="action-buttons-group">
+            <a routerLink="/login" class="btn-submit text-center" style="display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none;">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                <path d="M11 16l4-4-4-4m4 4H3"/>
+                <path d="M16 4h2a2 2 0 012 2v8a2 2 0 01-2 2h-2"/>
+              </svg>
+              <span>Back to Sign In</span>
+            </a>
+          </div>
+        </div>
+      } @else {
+        <div class="card-header-group">
+          <h2 class="card-heading">Create Requester Account</h2>
+          <p class="card-subheading">Submit your details to register for the self-service portal</p>
+        </div>
+
+        <!-- Role Info Banner -->
+        <div class="role-badge-banner">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+          <div>
+            <strong>Requester Account:</strong> Once approved by your organization's administrator, you can log in to raise and track support requests.
+          </div>
+        </div>
+
+        <!-- Error Alert -->
+        @if (errorMessage) {
+          <div class="alert alert-danger">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <form (ngSubmit)="onSubmit()" class="register-form">
+          <!-- Full Name -->
+          <div class="form-group">
+            <label class="form-label" for="reg-fullname">Full Name <span class="required">*</span></label>
+            <input
+              id="reg-fullname"
+              type="text"
+              class="form-control"
+              placeholder="e.g. Jane Doe"
+              [(ngModel)]="fullName"
+              name="fullName"
+              required
+            />
+          </div>
+
+          <!-- Email & Phone -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-email">Email Address <span class="required">*</span></label>
+              <input
+                id="reg-email"
+                type="email"
+                class="form-control"
+                placeholder="jane.doe@company.com"
+                [(ngModel)]="email"
+                name="email"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-phone">Phone Number <span class="optional">(optional)</span></label>
+              <input
+                id="reg-phone"
+                type="tel"
+                class="form-control"
+                placeholder="+1 (555) 000-0000"
+                [(ngModel)]="phone"
+                name="phone"
+              />
+            </div>
+          </div>
+
+          <!-- Password & Confirm -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Password <span class="required">*</span></label>
+              <input
+                id="reg-password"
+                type="password"
+                class="form-control"
+                placeholder="Min. 6 characters"
+                [(ngModel)]="password"
+                name="password"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-confirm">Confirm Password <span class="required">*</span></label>
+              <input
+                id="reg-confirm"
+                type="password"
+                class="form-control"
+                placeholder="Re-enter password"
+                [(ngModel)]="confirmPassword"
+                name="confirmPassword"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="isLoading"
+          >
+            @if (isLoading) {
+              <span class="spinner-sm"></span>
+              <span>Submitting Registration...</span>
+            } @else {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
+              <span>Submit Registration</span>
+            }
+          </button>
+
+          <div class="login-prompt">
+            <span>Already registered?</span>
+            <a routerLink="/login" class="login-link">Sign in to your account &rarr;</a>
+          </div>
+        </form>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="register-footer">
+      <span>ResolveHub Enterprise Platform &bull; Multi-Tenant Architecture</span>
+    </div>
+  </div>
+</div>

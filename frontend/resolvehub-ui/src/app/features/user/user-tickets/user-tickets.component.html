@@ -1,0 +1,190 @@
+<div class="user-tickets-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <span class="page-badge">Help Center</span>
+      <h1 class="page-title">My Requests</h1>
+      <p class="page-subtitle">View and monitor the status of all requests you have submitted.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/user/raise-ticket" class="btn btn-primary" id="btn-raise-new-ticket">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="10" y1="4" x2="10" y2="16"/>
+          <line x1="4" y1="10" x2="16" y2="10"/>
+        </svg>
+        <span>+ Raise Request</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters & Search Toolbar -->
+  <div class="toolbar-card">
+    <div class="toolbar-search">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="8.5" cy="8.5" r="5.5"/>
+        <line x1="12.5" y1="12.5" x2="17" y2="17"/>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search requests by ticket # or subject..."
+        [(ngModel)]="filters.searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <div class="toolbar-filters">
+      <select class="filter-select" [(ngModel)]="filters.status" (change)="onFilterChange()">
+        @for (opt of statusOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [(ngModel)]="filters.priority" (change)="onFilterChange()">
+        @for (opt of priorityOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [(ngModel)]="filters.ticketType" (change)="onFilterChange()">
+        @for (opt of typeOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+
+      @if (filters.searchTerm || filters.status || filters.priority || filters.ticketType) {
+        <button class="btn btn-sm btn-outline btn-reset" (click)="resetFilters()" title="Reset Filters">
+          Reset
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Main Table Section -->
+  <div class="table-card">
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading your requests...</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <div class="error-text">
+          <strong>Unable to load tickets</strong>
+          <p>{{ errorMessage }}</p>
+        </div>
+        <button class="btn btn-sm btn-outline" (click)="loadTickets()">Try Again</button>
+      </div>
+    } @else if (tickets.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <h3>No Requests Found</h3>
+        <p>
+          @if (filters.searchTerm || filters.status || filters.priority || filters.ticketType) {
+            No requests matched your filter criteria. Try clearing filters.
+          } @else {
+            You have not submitted any tickets yet. Need assistance? Submit a request today.
+          }
+        </p>
+        @if (filters.searchTerm || filters.status || filters.priority || filters.ticketType) {
+          <button class="btn btn-sm btn-outline" (click)="resetFilters()">Clear Filters</button>
+        } @else {
+          <a routerLink="/user/raise-ticket" class="btn btn-primary btn-sm">+ Raise Your First Request</a>
+        }
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Ticket #</th>
+              <th>Subject</th>
+              <th>Type</th>
+              <th>Department / Category</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Last Updated</th>
+              <th class="text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of tickets; track t.gId) {
+              <tr class="data-row" (click)="openTicketDetails(t.gId)">
+                <td class="font-mono text-primary font-semibold">
+                  {{ t.ticketNumber }}
+                </td>
+                <td class="subject-cell">
+                  <span class="subject-title" [title]="t.subject">{{ t.subject }}</span>
+                </td>
+                <td>
+                  <span class="type-pill" [attr.data-type]="t.ticketType">{{ t.ticketType }}</span>
+                </td>
+                <td class="dept-cat-cell">
+                  <span class="dept-text">{{ t.departmentName }}</span>
+                  <span class="cat-text">&bull; {{ t.categoryName }}</span>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusBadgeClass(t.status)">
+                    {{ t.status }}
+                  </span>
+                </td>
+                <td>
+                  <span class="priority-badge" [ngClass]="getPriorityBadgeClass(t.priority)">
+                    {{ t.priority }}
+                  </span>
+                </td>
+                <td class="date-cell">
+                  {{ (t.lastUpd || t.created) | date:'mediumDate' }}
+                </td>
+                <td class="text-right" (click)="$event.stopPropagation()">
+                  <button class="btn btn-sm btn-ghost" (click)="openTicketDetails(t.gId)">
+                    View &rarr;
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="pagination-footer">
+        <div class="pagination-info">
+          Showing {{ (filters.pageNumber - 1) * filters.pageSize + 1 }} -
+          {{ (filters.pageNumber * filters.pageSize) > totalCount ? totalCount : (filters.pageNumber * filters.pageSize) }}
+          of {{ totalCount }} requests
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination-buttons">
+            <button
+              class="page-btn"
+              [disabled]="filters.pageNumber <= 1"
+              (click)="goToPage(filters.pageNumber - 1)"
+            >
+              &larr; Prev
+            </button>
+            <span class="page-indicator">Page {{ filters.pageNumber }} of {{ totalPages }}</span>
+            <button
+              class="page-btn"
+              [disabled]="filters.pageNumber >= totalPages"
+              (click)="goToPage(filters.pageNumber + 1)"
+            >
+              Next &rarr;
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Detail Drawer -->
+  @if (selectedTicketGId) {
+    <app-ticket-detail
+      [ticketGId]="selectedTicketGId"
+      (close)="closeTicketDrawer()"
+      (ticketUpdated)="onTicketUpdated()"
+    />
+  }
+</div>

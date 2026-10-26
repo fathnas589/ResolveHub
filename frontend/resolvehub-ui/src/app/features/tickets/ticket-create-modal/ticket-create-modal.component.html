@@ -1,0 +1,188 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3 class="modal-title">Create New Ticket</h3>
+        <span class="modal-subtitle">Report a complaint or raise a service request</span>
+      </div>
+      <button type="button" class="btn-close" (click)="close.emit()" aria-label="Close modal">&times;</button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+
+      <!-- Ticket Type Segmented Control -->
+      <div class="form-group">
+        <label class="form-label">Ticket Type <span class="text-danger">*</span></label>
+        <div class="type-toggle-group">
+          <button
+            type="button"
+            class="type-toggle-btn"
+            [class.active]="ticketType === 'COMPLAINT'"
+            (click)="ticketType = 'COMPLAINT'"
+          >
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M10 3a7 7 0 1 0 7 7 7 7 0 0 0-7-7zM10 7v4M10 14h.01"/>
+            </svg>
+            <span>Complaint</span>
+          </button>
+          <button
+            type="button"
+            class="type-toggle-btn"
+            [class.active]="ticketType === 'SERVICE_REQUEST'"
+            (click)="ticketType = 'SERVICE_REQUEST'"
+          >
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M4 4h12v12H4zM8 4v12M4 8h12"/>
+            </svg>
+            <span>Service Request</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Department -> Category -> SubCategory Cascading Dropdowns -->
+      <div class="hierarchy-grid">
+        <!-- Department Dropdown -->
+        <div class="form-group">
+          <label for="createDept" class="form-label">Department <span class="text-danger">*</span></label>
+          <select
+            id="createDept"
+            class="form-control"
+            [(ngModel)]="departmentGId"
+            (ngModelChange)="onDepartmentChange()"
+            [disabled]="isSubmitting || isLoadingDepartments"
+          >
+            <option value="" disabled>-- Select Department --</option>
+            @for (dept of departments; track dept.gId) {
+              <option [value]="dept.gId">{{ dept.departmentName }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="form-group">
+          <label for="createCat" class="form-label">Category <span class="text-danger">*</span></label>
+          <select
+            id="createCat"
+            class="form-control"
+            [(ngModel)]="categoryGId"
+            (ngModelChange)="onCategoryChange()"
+            [disabled]="isSubmitting || isLoadingCategories || !departmentGId || categories.length === 0"
+          >
+            <option value="" disabled>
+              @if (isLoadingCategories) {
+                Loading categories...
+              } @else if (!departmentGId) {
+                Select Department first
+              } @else if (categories.length === 0) {
+                -- No categories found for this department --
+              } @else {
+                -- Select Category ({{ categories.length }} available) --
+              }
+            </option>
+            @for (cat of categories; track cat.gId) {
+              <option [value]="cat.gId">{{ cat.categoryName }}</option>
+            }
+          </select>
+          @if (!isLoadingCategories && departmentGId && categories.length === 0) {
+            <small class="text-warning">
+              No categories configured for this department.
+            </small>
+          }
+        </div>
+
+        <!-- SubCategory Dropdown (Optional) -->
+        <div class="form-group">
+          <label for="createSubCat" class="form-label">SubCategory <span class="text-muted">(Optional)</span></label>
+          <select
+            id="createSubCat"
+            class="form-control"
+            [(ngModel)]="subCategoryGId"
+            [disabled]="isSubmitting || isLoadingSubCategories || !categoryGId || subCategories.length === 0"
+          >
+            <option [ngValue]="null">
+              @if (isLoadingSubCategories) {
+                Loading subcategories...
+              } @else if (!categoryGId) {
+                Select Category first
+              } @else if (subCategories.length === 0) {
+                -- None / General (No subcategories) --
+              } @else {
+                -- Select SubCategory (Optional) --
+              }
+            </option>
+            @for (subCat of subCategories; track subCat.gId) {
+              <option [value]="subCat.gId">{{ subCat.subCategoryName }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Priority -->
+      <div class="form-group">
+        <label for="createPriority" class="form-label">Priority <span class="text-danger">*</span></label>
+        <select
+          id="createPriority"
+          class="form-control"
+          [(ngModel)]="priority"
+          [disabled]="isSubmitting"
+        >
+          <option value="LOW">Low (Minor inconvenience)</option>
+          <option value="MEDIUM">Medium (Standard priority)</option>
+          <option value="HIGH">High (Urgent attention needed)</option>
+          <option value="CRITICAL">Critical (Total work stoppage)</option>
+        </select>
+      </div>
+
+      <!-- Subject -->
+      <div class="form-group">
+        <label for="createSubject" class="form-label">Subject <span class="text-danger">*</span></label>
+        <input
+          id="createSubject"
+          type="text"
+          class="form-control"
+          [(ngModel)]="subject"
+          placeholder="Brief summary of the issue or request..."
+          maxlength="200"
+          [disabled]="isSubmitting"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="createDesc" class="form-label">Description <span class="text-danger">*</span></label>
+        <textarea
+          id="createDesc"
+          class="form-control textarea"
+          rows="4"
+          [(ngModel)]="description"
+          placeholder="Provide detailed description, steps to reproduce, or specific requirements..."
+          [disabled]="isSubmitting"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="close.emit()" [disabled]="isSubmitting">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="submit()"
+        [disabled]="isSubmitting || !departmentGId || !categoryGId || !subject.trim() || !description.trim()"
+      >
+        @if (isSubmitting) {
+          <span>Submitting...</span>
+        } @else {
+          <span>Submit Ticket</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

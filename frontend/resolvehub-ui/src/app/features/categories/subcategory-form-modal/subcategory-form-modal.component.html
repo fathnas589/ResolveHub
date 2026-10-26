@@ -1,0 +1,112 @@
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-icon-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="modal-title">{{ isEditMode ? 'Edit SubCategory' : 'Create New SubCategory' }}</h3>
+        <p class="modal-subtitle">Define granular issue types within a category</p>
+      </div>
+      <button type="button" class="close-btn" (click)="onCancel()" aria-label="Close modal">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Error Alert -->
+    @if (errorMessage) {
+      <div class="error-alert">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    <!-- Form Content -->
+    <form (ngSubmit)="onSubmit()" class="modal-form">
+      <!-- Parent Category Dropdown -->
+      <div class="form-group">
+        <label for="categoryGId" class="form-label">
+          Parent Category <span class="required">*</span>
+        </label>
+        <select
+          id="categoryGId"
+          class="form-select"
+          [(ngModel)]="formData.categoryGId"
+          name="categoryGId"
+          required
+        >
+          <option value="" disabled>Select parent category</option>
+          @for (cat of allCategories; track cat.gId) {
+            <option [value]="cat.gId">{{ cat.categoryName }} ({{ cat.departmentName }})</option>
+          }
+        </select>
+      </div>
+
+      <!-- SubCategory Name -->
+      <div class="form-group">
+        <label for="subCategoryName" class="form-label">
+          SubCategory Name <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="subCategoryName"
+          class="form-input"
+          [(ngModel)]="formData.subCategoryName"
+          name="subCategoryName"
+          placeholder="e.g. VPN Access Issue, Salary Discrepancy, Monitor Replacement"
+          maxlength="100"
+          required
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description" class="form-label">Description</label>
+        <textarea
+          id="description"
+          class="form-textarea"
+          rows="3"
+          [(ngModel)]="formData.description"
+          name="description"
+          placeholder="Optional brief description of this subcategory..."
+          maxlength="250"
+        ></textarea>
+      </div>
+
+      <!-- Active Status Checkbox -->
+      <div class="form-group-checkbox">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            class="checkbox-input"
+            [(ngModel)]="formData.isActive"
+            name="isActive"
+          />
+          <span class="checkbox-text">Active SubCategory (available for selection on tickets)</span>
+        </label>
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="isSaving">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving">
+          @if (isSaving) {
+            <span class="spinner-sm"></span>
+            <span>Saving...</span>
+          } @else {
+            <span>{{ isEditMode ? 'Update SubCategory' : 'Create SubCategory' }}</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

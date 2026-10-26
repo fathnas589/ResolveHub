@@ -1,0 +1,430 @@
+<div class="tickets-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-title-group">
+      <div class="title-with-badge">
+        <h1 class="page-title">Tickets & Requests</h1>
+        <span class="count-pill">{{ totalCount }} total</span>
+      </div>
+      <p class="page-subtitle">Track, assign, and resolve user complaints and IT/HR service requests.</p>
+    </div>
+
+    <div class="header-actions">
+      <!-- View Mode Toggle: Table vs Kanban -->
+      <div class="view-mode-toggle">
+        <button
+          type="button"
+          class="view-toggle-btn"
+          [class.active]="viewMode === 'table'"
+          (click)="setViewMode('table')"
+          title="Table View"
+        >
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M3 5h14M3 10h14M3 15h14"/>
+          </svg>
+          <span>Table</span>
+        </button>
+        <button
+          type="button"
+          class="view-toggle-btn"
+          [class.active]="viewMode === 'kanban'"
+          (click)="setViewMode('kanban')"
+          title="Kanban Board View"
+        >
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="3" y="4" width="4" height="12" rx="1"/>
+            <rect x="8" y="4" width="4" height="8" rx="1"/>
+            <rect x="13" y="4" width="4" height="10" rx="1"/>
+          </svg>
+          <span>Kanban</span>
+        </button>
+      </div>
+
+      <!-- New Ticket Button -->
+      <button type="button" class="btn btn-primary" (click)="showCreateModal = true">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <line x1="10" y1="4" x2="10" y2="16"/>
+          <line x1="4" y1="10" x2="16" y2="10"/>
+        </svg>
+        <span>New Ticket</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Metric Cards -->
+  <div class="stats-grid">
+    <!-- Card 1: Total Tickets -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Total Tickets</span>
+        <div class="stat-icon-wrapper stat-icon-primary">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M17 12a3 3 0 0 1-3 3H6l-3 3V5a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v7z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value">{{ totalCount }}</div>
+      <div class="stat-subtext">Across organization</div>
+    </div>
+
+    <!-- Card 2: Open / Assigned -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">Open / Queued</span>
+        <div class="stat-icon-wrapper stat-icon-info">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="10" cy="10" r="7"/>
+            <path d="M10 6v4l3 2"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value stat-value-info">{{ kpiOpenCount }}</div>
+      <div class="stat-subtext">Awaiting resolution work</div>
+    </div>
+
+    <!-- Card 3: In Progress -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">In Progress</span>
+        <div class="stat-icon-wrapper stat-icon-warning">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value stat-value-warning">{{ kpiInProgressCount }}</div>
+      <div class="stat-subtext">Being actively worked on</div>
+    </div>
+
+    <!-- Card 4: High / Critical -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-label">High / Critical</span>
+        <div class="stat-icon-wrapper stat-icon-danger">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M10 3a7 7 0 1 0 7 7 7 7 0 0 0-7-7zM10 7v4M10 14h.01"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value stat-value-danger">{{ kpiCriticalCount }}</div>
+      <div class="stat-subtext">Urgent priority tickets</div>
+    </div>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="toolbar-card">
+    <div class="toolbar-row">
+      <!-- Search -->
+      <div class="search-input-box">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="9" cy="9" r="6"/>
+          <line x1="13.5" y1="13.5" x2="17.5" y2="17.5"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by ticket #, subject..."
+          [(ngModel)]="filters.searchTerm"
+          (ngModelChange)="onFilterChange()"
+        />
+      </div>
+
+      <!-- Ticket Type Filter -->
+      <select class="filter-select" [(ngModel)]="filters.ticketType" (ngModelChange)="onFilterChange()">
+        <option value="">All Types</option>
+        <option value="COMPLAINT">Complaint</option>
+        <option value="SERVICE_REQUEST">Service Request</option>
+      </select>
+
+      <!-- Status Filter -->
+      <select class="filter-select" [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()">
+        <option value="">All Statuses</option>
+        <option value="OPEN">Open</option>
+        <option value="ASSIGNED">Assigned</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="PENDING_USER">Pending User</option>
+        <option value="RESOLVED">Resolved</option>
+        <option value="CLOSED">Closed</option>
+      </select>
+
+      <!-- Priority Filter -->
+      <select class="filter-select" [(ngModel)]="filters.priority" (ngModelChange)="onFilterChange()">
+        <option value="">All Priorities</option>
+        <option value="LOW">Low</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="HIGH">High</option>
+        <option value="CRITICAL">Critical</option>
+      </select>
+
+      <!-- Department Filter -->
+      <select class="filter-select" [(ngModel)]="filters.departmentGId" (ngModelChange)="onFilterChange()">
+        <option value="">All Departments</option>
+        @for (dept of departments; track dept.gId) {
+          <option [value]="dept.gId">{{ dept.departmentName }}</option>
+        }
+      </select>
+
+      <!-- My Tickets Toggle -->
+      <label class="my-tickets-toggle" title="Filter tickets created by or assigned to you">
+        <input
+          type="checkbox"
+          [(ngModel)]="filters.myTicketsOnly"
+          (change)="onFilterChange()"
+        />
+        <span>My Tickets</span>
+      </label>
+
+      <!-- Reset Button -->
+      <button type="button" class="btn btn-secondary btn-sm" (click)="resetFilters()" title="Reset all filters">
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Banner -->
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn-secondary btn-sm" (click)="loadTickets()">Retry</button>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading tickets...</p>
+    </div>
+  }
+
+  <!-- 1. TABLE VIEW -->
+  @if (!isLoading && viewMode === 'table') {
+    <div class="table-container">
+      @if (tickets.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <h3>No Tickets Found</h3>
+          <p>No tickets match your active filter criteria.</p>
+          <button class="btn btn-secondary btn-sm" (click)="resetFilters()">Clear Filters</button>
+        </div>
+      } @else {
+        <table class="tickets-table">
+          <thead>
+            <tr>
+              <th class="th-code">Code</th>
+              <th class="th-subject">Subject</th>
+              <th class="th-type">Type</th>
+              <th class="th-dept">Department</th>
+              <th class="th-status">Status</th>
+              <th class="th-priority">Priority</th>
+              <th class="th-sla">SLA Status</th>
+              <th class="th-assignee">Assignee</th>
+              <th class="th-updated">Updated</th>
+              <th class="th-actions">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ticket of tickets; track ticket.gId) {
+              <tr class="ticket-row" (click)="openTicketDetail(ticket)">
+                <!-- Ticket Number / Code -->
+                <td class="td-code" (click)="$event.stopPropagation(); openTicketDetail(ticket)">
+                  <span class="ticket-code">{{ ticket.ticketNumber }}</span>
+                </td>
+
+                <!-- Subject -->
+                <td class="td-subject">
+                  <div class="subject-cell">
+                    <span class="subject-text" [title]="ticket.subject">{{ ticket.subject }}</span>
+                    @if (ticket.categoryName) {
+                      <span class="category-subtext">{{ ticket.categoryName }}</span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Type -->
+                <td class="td-type">
+                  <span class="badge badge-type" [attr.data-type]="ticket.ticketType">
+                    {{ ticket.ticketType === 'SERVICE_REQUEST' ? 'Request' : 'Complaint' }}
+                  </span>
+                </td>
+
+                <!-- Department -->
+                <td class="td-dept">
+                  <span class="dept-text">{{ ticket.departmentName }}</span>
+                </td>
+
+                <!-- Status -->
+                <td class="td-status">
+                  <span class="badge badge-status" [attr.data-status]="ticket.status">
+                    {{ ticket.status.replace('_', ' ') }}
+                  </span>
+                </td>
+
+                <!-- Priority -->
+                <td class="td-priority">
+                  <span class="badge badge-priority" [attr.data-priority]="ticket.priority">
+                    {{ ticket.priority }}
+                  </span>
+                </td>
+
+                <!-- SLA Status -->
+                <td class="td-sla">
+                  @if (ticket.sla) {
+                    <span
+                      class="badge badge-sla"
+                      [attr.data-sla]="ticket.sla.slaHealth"
+                      [title]="ticket.sla.slaPolicyName"
+                    >
+                      <span class="sla-dot"></span>
+                      {{ formatSlaHealth(ticket.sla.slaHealth) }}
+                    </span>
+                  } @else {
+                    <span class="sla-none">—</span>
+                  }
+                </td>
+
+                <!-- Assignee -->
+                <td class="td-assignee">
+                  @if (ticket.assignedToFullName) {
+                    <div class="assignee-cell" [title]="ticket.assignedToFullName">
+                      <span class="avatar-xs avatar-agent">{{ getInitials(ticket.assignedToFullName) }}</span>
+                      <span class="assignee-name">{{ ticket.assignedToFullName }}</span>
+                    </div>
+                  } @else {
+                    <span class="unassigned-text">Unassigned</span>
+                  }
+                </td>
+
+                <!-- Last Updated -->
+                <td class="td-updated">
+                  <span class="date-text" [title]="ticket.lastUpd | date:'medium'">
+                    {{ ticket.lastUpd | date:'shortDate' }}
+                  </span>
+                </td>
+
+                <!-- Action -->
+                <td class="td-actions" (click)="$event.stopPropagation()">
+                  <button
+                    type="button"
+                    class="btn-row-action"
+                    (click)="openTicketDetail(ticket)"
+                    title="View Details"
+                  >
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                      <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- Pagination Bar -->
+        <div class="pagination-bar">
+          <div class="pagination-info">
+            Showing page {{ filters.pageNumber }} of {{ totalPages }} ({{ totalCount }} tickets)
+          </div>
+          <div class="pagination-controls">
+            <button
+              class="btn-page"
+              [disabled]="filters.pageNumber <= 1"
+              (click)="goToPage(filters.pageNumber - 1)"
+            >
+              Previous
+            </button>
+            <span class="page-number-active">{{ filters.pageNumber }}</span>
+            <button
+              class="btn-page"
+              [disabled]="filters.pageNumber >= totalPages"
+              (click)="goToPage(filters.pageNumber + 1)"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- 2. KANBAN BOARD VIEW -->
+  @if (!isLoading && viewMode === 'kanban') {
+    <div class="kanban-board">
+      @for (col of kanbanColumns; track col.status) {
+        <div class="kanban-column">
+          <div class="column-header" [style.border-top-color]="col.color">
+            <div class="column-title-group">
+              <span class="column-status-indicator" [style.background-color]="col.color"></span>
+              <h4 class="column-title">{{ col.label }}</h4>
+            </div>
+            <span class="column-count-badge">{{ getKanbanTickets(col.status).length }}</span>
+          </div>
+
+          <div class="column-cards-list">
+            @for (ticket of getKanbanTickets(col.status); track ticket.gId) {
+              <div class="kanban-card" (click)="openTicketDetail(ticket)">
+                <div class="card-top-row">
+                  <span class="card-ticket-code">{{ ticket.ticketNumber }}</span>
+                  <span class="badge badge-priority badge-xs" [attr.data-priority]="ticket.priority">
+                    {{ ticket.priority }}
+                  </span>
+                </div>
+
+                <h5 class="card-subject">{{ ticket.subject }}</h5>
+
+                <div class="card-meta-row">
+                  <span class="card-dept">{{ ticket.departmentName }}</span>
+                  <span class="card-type-tag" [attr.data-type]="ticket.ticketType">
+                    {{ ticket.ticketType === 'SERVICE_REQUEST' ? 'REQ' : 'COMP' }}
+                  </span>
+                  @if (ticket.sla) {
+                    <span class="sla-badge-xs" [attr.data-sla]="ticket.sla.slaHealth" [title]="'SLA: ' + formatSlaHealth(ticket.sla.slaHealth)">
+                      <span class="sla-dot-xs"></span>
+                      {{ formatSlaHealth(ticket.sla.slaHealth) }}
+                    </span>
+                  }
+                </div>
+
+                <div class="card-footer-row">
+                  <div class="user-inline" [title]="'Requester: ' + ticket.createdByFullName">
+                    <span class="avatar-xs">{{ getInitials(ticket.createdByFullName) }}</span>
+                  </div>
+
+                  @if (ticket.assignedToFullName) {
+                    <div class="user-inline" [title]="'Assignee: ' + ticket.assignedToFullName">
+                      <span class="avatar-xs avatar-agent">{{ getInitials(ticket.assignedToFullName) }}</span>
+                    </div>
+                  } @else {
+                    <span class="unassigned-xs">Unassigned</span>
+                  }
+                </div>
+              </div>
+            }
+            @if (getKanbanTickets(col.status).length === 0) {
+              <div class="column-empty">No tickets in this stage</div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal: Create New Ticket -->
+@if (showCreateModal) {
+  <app-ticket-create-modal
+    (close)="showCreateModal = false"
+    (created)="onTicketCreated($event)"
+  ></app-ticket-create-modal>
+}
+
+<!-- Slide-over Drawer: Ticket Details -->
+@if (selectedTicketGId) {
+  <app-ticket-detail
+    [ticketGId]="selectedTicketGId"
+    (close)="closeTicketDetail()"
+    (ticketUpdated)="onTicketUpdated()"
+    (ticketDeleted)="onTicketDeleted()"
+  ></app-ticket-detail>
+}

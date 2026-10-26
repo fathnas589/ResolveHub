@@ -1,0 +1,212 @@
+<div class="user-raise-ticket-page">
+  <!-- Breadcrumb Navigation -->
+  <div class="page-top-nav">
+    <a routerLink="/user/dashboard" class="back-link">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 10H5M10 15l-5-5 5-5"/>
+      </svg>
+      <span>Back to Dashboard</span>
+    </a>
+  </div>
+
+  <div class="form-wrapper-card">
+    <div class="form-header">
+      <span class="form-badge">New Request</span>
+      <h1 class="form-title">Submit a Service Request or Issue</h1>
+      <p class="form-subtitle">Fill in the details below. Your ticket will automatically match the active SLA policy and route to the responsible support team.</p>
+    </div>
+
+    <!-- Error Banner -->
+    @if (formErrorMessage) {
+      <div class="error-banner">
+        <div class="error-icon">⚠️</div>
+        <div class="error-text">
+          <strong>Submission Error</strong>
+          <p>{{ formErrorMessage }}</p>
+        </div>
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" class="raise-ticket-form">
+      <!-- 1. Request Type Selector -->
+      <div class="form-group">
+        <label class="field-label">Request Type <span class="required">*</span></label>
+        <div class="type-selector-grid">
+          <label class="type-card" [class.selected]="ticketType === 'SERVICE_REQUEST'">
+            <input
+              type="radio"
+              name="ticketType"
+              value="SERVICE_REQUEST"
+              [(ngModel)]="ticketType"
+            />
+            <div class="type-icon-box">🛠️</div>
+            <div class="type-info">
+              <span class="type-title">Service Request</span>
+              <span class="type-desc">Request for hardware, software access, permissions, or workplace services</span>
+            </div>
+          </label>
+
+          <label class="type-card" [class.selected]="ticketType === 'COMPLAINT'">
+            <input
+              type="radio"
+              name="ticketType"
+              value="COMPLAINT"
+              [(ngModel)]="ticketType"
+            />
+            <div class="type-icon-box">🚨</div>
+            <div class="type-info">
+              <span class="type-title">Complaint / Issue</span>
+              <span class="type-desc">Report a disruption, bug, technical outage, or grievance</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- 2. Department & Category Cascade -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="field-label" for="departmentSelect">Department <span class="required">*</span></label>
+          <select
+            id="departmentSelect"
+            name="departmentGId"
+            class="form-select"
+            [(ngModel)]="departmentGId"
+            (change)="onDepartmentChange()"
+            [disabled]="isLoadingDepartments || isSubmitting"
+            required
+          >
+            <option value="" disabled selected>-- Select Department --</option>
+            @for (dept of departments; track dept.gId) {
+              <option [value]="dept.gId">{{ dept.departmentName }}</option>
+            }
+          </select>
+          @if (isLoadingDepartments) {
+            <span class="field-hint">Loading departments...</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="field-label" for="categorySelect">Category <span class="required">*</span></label>
+          <select
+            id="categorySelect"
+            name="categoryGId"
+            class="form-select"
+            [(ngModel)]="categoryGId"
+            (change)="onCategoryChange()"
+            [disabled]="!departmentGId || isLoadingCategories || isSubmitting"
+            required
+          >
+            <option value="" disabled selected>
+              {{ departmentGId ? (isLoadingCategories ? 'Loading categories...' : '-- Select Category --') : 'Select department first' }}
+            </option>
+            @for (cat of categories; track cat.gId) {
+              <option [value]="cat.gId">{{ cat.categoryName }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- 3. SubCategory (optional) & Priority -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="field-label" for="subCategorySelect">
+            SubCategory <span class="optional-text">(Optional)</span>
+          </label>
+          <select
+            id="subCategorySelect"
+            name="subCategoryGId"
+            class="form-select"
+            [(ngModel)]="subCategoryGId"
+            [disabled]="!categoryGId || isLoadingSubCategories || subCategories.length === 0 || isSubmitting"
+          >
+            <option value="">
+              {{ subCategories.length === 0 ? (categoryGId ? 'No subcategories available' : 'Select category first') : '-- Select SubCategory --' }}
+            </option>
+            @for (sc of subCategories; track sc.gId) {
+              <option [value]="sc.gId">{{ sc.subCategoryName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label" for="prioritySelect">Priority <span class="required">*</span></label>
+          <select
+            id="prioritySelect"
+            name="priority"
+            class="form-select"
+            [(ngModel)]="priority"
+            [disabled]="isSubmitting"
+            required
+          >
+            @for (opt of priorityOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }} &mdash; {{ opt.desc }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- 4. Subject -->
+      <div class="form-group">
+        <label class="field-label" for="ticketSubject">
+          Subject / Brief Summary <span class="required">*</span>
+        </label>
+        <input
+          id="ticketSubject"
+          type="text"
+          name="subject"
+          class="form-input"
+          placeholder="e.g. Laptop display flickering, need VPN configuration, payroll discrepancy..."
+          [(ngModel)]="subject"
+          [disabled]="isSubmitting"
+          maxlength="200"
+          required
+        />
+        <div class="char-count">{{ subject.length }}/200</div>
+      </div>
+
+      <!-- 5. Description -->
+      <div class="form-group">
+        <label class="field-label" for="ticketDescription">
+          Detailed Description <span class="required">*</span>
+        </label>
+        <textarea
+          id="ticketDescription"
+          name="description"
+          rows="5"
+          class="form-textarea"
+          placeholder="Please describe what happened, steps to reproduce, error messages, or specific assistance required..."
+          [(ngModel)]="description"
+          [disabled]="isSubmitting"
+          required
+        ></textarea>
+        <div class="char-count">
+          @if (description && description.trim().length < 3) {
+            <span style="color: #f59e0b; margin-right: 0.5rem;">Minimum 3 characters required</span>
+          }
+          {{ description.length }} characters
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <a routerLink="/user/dashboard" class="btn btn-outline" [class.disabled]="isSubmitting">Cancel</a>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="btn-submit-ticket"
+          [disabled]="isSubmitting"
+        >
+          @if (isSubmitting) {
+            <span class="spinner-sm"></span>
+            <span>Submitting Request...</span>
+          } @else {
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 16l6-6-6-6M4 10h12"/>
+            </svg>
+            <span>Submit Request</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,273 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <span class="modal-badge-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </span>
+        <div>
+          <h2 class="modal-title">{{ isEditMode ? 'Edit SLA Policy' : 'Create SLA Policy' }}</h2>
+          <p class="modal-subtitle">Configure response and resolution thresholds with specificity matching</p>
+        </div>
+      </div>
+      <button type="button" class="btn-icon-close" (click)="close()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Error Alert -->
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    <!-- Modal Form -->
+    <form (ngSubmit)="onSubmit()" class="modal-form">
+      <div class="form-body">
+        <!-- Name & Default Row -->
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="sla-name">
+              Policy Name <span class="required">*</span>
+            </label>
+            <input
+              id="sla-name"
+              type="text"
+              class="form-control"
+              placeholder="e.g. Critical Hardware Policy"
+              [(ngModel)]="name"
+              name="name"
+              required
+            />
+          </div>
+
+          <div class="form-group-checkboxes">
+            <label class="checkbox-container">
+              <input
+                type="checkbox"
+                [(ngModel)]="isDefault"
+                name="isDefault"
+              />
+              <span class="checkbox-checkmark"></span>
+              <span class="checkbox-label">
+                <strong>Default Policy</strong>
+                <small>Fallback when no specific policy matches</small>
+              </span>
+            </label>
+
+            <label class="checkbox-container">
+              <input
+                type="checkbox"
+                [(ngModel)]="isActive"
+                name="isActive"
+              />
+              <span class="checkbox-checkmark"></span>
+              <span class="checkbox-label">
+                <strong>Active</strong>
+                <small>Available for matching</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label" for="sla-desc">Description</label>
+          <textarea
+            id="sla-desc"
+            class="form-control textarea"
+            rows="2"
+            placeholder="Brief purpose or scope of this SLA policy..."
+            [(ngModel)]="description"
+            name="description"
+          ></textarea>
+        </div>
+
+        <!-- Section: Specificity Hierarchy Filters -->
+        <div class="section-divider">
+          <span>Hierarchy & Eligibility Criteria (Optional)</span>
+        </div>
+
+        <div class="form-row form-row-3">
+          <!-- Department -->
+          <div class="form-group">
+            <label class="form-label" for="sla-dept">Department</label>
+            <select
+              id="sla-dept"
+              class="form-control select"
+              [(ngModel)]="departmentGId"
+              name="departmentGId"
+              (change)="onDepartmentChange()"
+            >
+              <option [ngValue]="null">All Departments</option>
+              @for (dept of departments; track dept.gId) {
+                <option [value]="dept.gId">{{ dept.departmentName }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label class="form-label" for="sla-cat">Category</label>
+            <select
+              id="sla-cat"
+              class="form-control select"
+              [(ngModel)]="categoryGId"
+              name="categoryGId"
+              (change)="onCategoryChange()"
+              [disabled]="!departmentGId"
+            >
+              <option [ngValue]="null">All Categories</option>
+              @for (cat of categories; track cat.gId) {
+                <option [value]="cat.gId">{{ cat.categoryName }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- SubCategory -->
+          <div class="form-group">
+            <label class="form-label" for="sla-subcat">SubCategory</label>
+            <select
+              id="sla-subcat"
+              class="form-control select"
+              [(ngModel)]="subCategoryGId"
+              name="subCategoryGId"
+              [disabled]="!categoryGId"
+            >
+              <option [ngValue]="null">All SubCategories</option>
+              @for (sc of subCategories; track sc.gId) {
+                <option [value]="sc.gId">{{ sc.subCategoryName }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row form-row-2">
+          <!-- Priority Filter -->
+          <div class="form-group">
+            <label class="form-label" for="sla-priority">Priority</label>
+            <select
+              id="sla-priority"
+              class="form-control select"
+              [(ngModel)]="priority"
+              name="priority"
+            >
+              @for (p of priorities; track p.value) {
+                <option [value]="p.value">{{ p.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Ticket Type Filter -->
+          <div class="form-group">
+            <label class="form-label" for="sla-type">Ticket Type</label>
+            <select
+              id="sla-type"
+              class="form-control select"
+              [(ngModel)]="ticketType"
+              name="ticketType"
+            >
+              @for (t of ticketTypes; track t.value) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Section: Timings & Thresholds -->
+        <div class="section-divider">
+          <span>Target Timelines (Minutes)</span>
+        </div>
+
+        <div class="form-row form-row-3">
+          <!-- First Response Minutes -->
+          <div class="form-group">
+            <label class="form-label" for="sla-first-resp">
+              First Response (Mins) <span class="required">*</span>
+            </label>
+            <div class="input-with-suffix">
+              <input
+                id="sla-first-resp"
+                type="number"
+                class="form-control"
+                min="1"
+                [(ngModel)]="firstResponseMinutes"
+                name="firstResponseMinutes"
+                required
+              />
+              <span class="input-suffix">mins</span>
+            </div>
+            <span class="field-hint">e.g. 60 = 1 hour</span>
+          </div>
+
+          <!-- Resolution Minutes -->
+          <div class="form-group">
+            <label class="form-label" for="sla-resolution">
+              Resolution (Mins) <span class="required">*</span>
+            </label>
+            <div class="input-with-suffix">
+              <input
+                id="sla-resolution"
+                type="number"
+                class="form-control"
+                min="1"
+                [(ngModel)]="resolutionMinutes"
+                name="resolutionMinutes"
+                required
+              />
+              <span class="input-suffix">mins</span>
+            </div>
+            <span class="field-hint">e.g. 240 = 4 hours</span>
+          </div>
+
+          <!-- Escalation Before Minutes -->
+          <div class="form-group">
+            <label class="form-label" for="sla-escalation">
+              Warning Before Due (Mins)
+            </label>
+            <div class="input-with-suffix">
+              <input
+                id="sla-escalation"
+                type="number"
+                class="form-control"
+                min="0"
+                [(ngModel)]="escalationBeforeMinutes"
+                name="escalationBeforeMinutes"
+              />
+              <span class="input-suffix">mins</span>
+            </div>
+            <span class="field-hint">Trigger WARNING threshold</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="close()" [disabled]="isSaving">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving">
+          @if (isSaving) {
+            <span class="spinner-inline"></span>
+            Saving...
+          } @else {
+            {{ isEditMode ? 'Update Policy' : 'Create Policy' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

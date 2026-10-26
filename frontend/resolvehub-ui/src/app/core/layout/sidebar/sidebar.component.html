@@ -1,0 +1,120 @@
+<aside class="sidebar-container" [class.collapsed]="isCollapsed">
+  <!-- Brand Logo Section -->
+  <div class="sidebar-brand">
+    <div class="brand-badge-logo">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    @if (!isCollapsed) {
+      <div class="brand-text-block">
+        <span class="brand-title">ResolveHub</span>
+        <span class="brand-subtitle">Enterprise Ops</span>
+      </div>
+    }
+  </div>
+
+  <!-- Main Navigation Section -->
+  <div class="sidebar-content">
+    <div class="nav-section-label" [class.visually-hidden]="isCollapsed">
+      {{ currentRole === 'USER' ? 'PORTAL' : 'OPERATIONS' }}
+    </div>
+
+    <nav class="nav-list">
+      @for (item of navItems; track item.label) {
+        <a
+          [routerLink]="item.route"
+          [queryParams]="item.queryParams || null"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: !item.queryParams }"
+          class="nav-link"
+          [title]="item.label"
+        >
+          <span class="nav-icon">
+            <!-- Dashboard -->
+            @if (item.icon === 'dashboard') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.5" y="2.5" width="6.5" height="6.5" rx="1.5"/>
+                <rect x="11" y="2.5" width="6.5" height="6.5" rx="1.5"/>
+                <rect x="2.5" y="11" width="6.5" height="6.5" rx="1.5"/>
+                <rect x="11" y="11" width="6.5" height="6.5" rx="1.5"/>
+              </svg>
+            } @else if (item.icon === 'departments') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12"/>
+                <path d="M9 18v-4a1 1 0 0 1 1-1h0a1 1 0 0 1 1 1v4"/>
+                <path d="M7 8h2M11 8h2M7 11h2M11 11h2"/>
+              </svg>
+            } @else if (item.icon === 'complaints') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 12a3 3 0 0 1-3 3H6l-3 3V5a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v7z"/>
+                <path d="M7 8h6M7 11h4"/>
+              </svg>
+            } @else if (item.icon === 'plus') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="10" y1="4" x2="10" y2="16"/>
+                <line x1="4" y1="10" x2="16" y2="10"/>
+              </svg>
+            } @else if (item.icon === 'sla') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="10" cy="10" r="7"/>
+                <polyline points="10 6 10 10 13 12"/>
+              </svg>
+            } @else if (item.icon === 'categories') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h14M3 10h14M3 14h14"/>
+              </svg>
+            } @else if (item.icon === 'priorities') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 4l6 4-6 4V4zM11 5h6M11 9h6M11 13h4"/>
+              </svg>
+            } @else if (item.icon === 'users') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 17a4 4 0 0 0-8 0"/>
+                <circle cx="10" cy="7" r="3"/>
+              </svg>
+            } @else if (item.icon === 'reports') {
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 17V8M10 17V3M5 17v-6"/>
+              </svg>
+            }
+          </span>
+
+          @if (!isCollapsed) {
+            <span class="nav-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    </nav>
+  </div>
+
+  <!-- Bottom Section: Settings & User Profile -->
+  <div class="sidebar-footer">
+    <!-- Settings link (disabled placeholder) -->
+    <div class="nav-link nav-link-disabled footer-link" title="Settings">
+      <span class="nav-icon">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="3"/>
+          <path d="M16.2 12.3a1.2 1.2 0 0 0 .2 1.4l.2.2a1.5 1.5 0 0 1-2.1 2.1l-.2-.2a1.2 1.2 0 0 0-1.4-.2 1.2 1.2 0 0 0-.7 1.1v.4a1.5 1.5 0 0 1-3 0v-.4a1.2 1.2 0 0 0-.7-1.1 1.2 1.2 0 0 0-1.4.2l-.2.2a1.5 1.5 0 0 1-2.1-2.1l.2-.2a1.2 1.2 0 0 0 .2-1.4 1.2 1.2 0 0 0-1.1-.7H3.8a1.5 1.5 0 0 1 0-3h.4a1.2 1.2 0 0 0 1.1-.7 1.2 1.2 0 0 0-.2-1.4l-.2-.2a1.5 1.5 0 0 1 2.1-2.1l.2.2a1.2 1.2 0 0 0 1.4.2 1.2 1.2 0 0 0 .7-1.1V3.8a1.5 1.5 0 0 1 3 0v.4a1.2 1.2 0 0 0 .7 1.1 1.2 1.2 0 0 0 1.4-.2l.2-.2a1.5 1.5 0 0 1 2.1 2.1l-.2.2a1.2 1.2 0 0 0-.2 1.4 1.2 1.2 0 0 0 1.1.7h.4a1.5 1.5 0 0 1 0 3h-.4a1.2 1.2 0 0 0-1.1.7z"/>
+        </svg>
+      </span>
+      @if (!isCollapsed) {
+        <span class="nav-label">Settings</span>
+      }
+    </div>
+
+    <!-- User Profile Card -->
+    <div class="user-card" [class.collapsed]="isCollapsed">
+      <div class="user-avatar-wrapper">
+        <span class="user-avatar">{{ userInitials }}</span>
+        <span class="status-indicator" title="Online"></span>
+      </div>
+      @if (!isCollapsed) {
+        <div class="user-details">
+          <div class="user-name">{{ authService.currentUser()?.fullName || 'ResolveHub User' }}</div>
+          <div class="user-role">{{ authService.currentUser()?.role || 'USER' }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</aside>

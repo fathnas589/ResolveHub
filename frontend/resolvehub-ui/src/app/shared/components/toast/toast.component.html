@@ -1,0 +1,53 @@
+<div class="toast-viewport" aria-live="polite" aria-label="Notifications">
+  @for (toast of toasts(); track toast.id) {
+    <div class="toast-item toast-{{ toast.type }}" role="alert">
+      <!-- Icon -->
+      <div class="toast-icon-wrapper">
+        @if (toast.type === 'success') {
+          <svg class="toast-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 6L7.75 14.25L4 10.5"/>
+          </svg>
+        } @else if (toast.type === 'error') {
+          <svg class="toast-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="10" cy="10" r="7"/>
+            <line x1="10" y1="7" x2="10" y2="10"/>
+            <line x1="10" y1="13" x2="10.01" y2="13"/>
+          </svg>
+        } @else if (toast.type === 'warning') {
+          <svg class="toast-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 3L2 17H18L10 3Z"/>
+            <line x1="10" y1="8" x2="10" y2="12"/>
+            <line x1="10" y1="14" x2="10.01" y2="14"/>
+          </svg>
+        } @else {
+          <svg class="toast-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="10" cy="10" r="7"/>
+            <line x1="10" y1="9" x2="10" y2="14"/>
+            <line x1="10" y1="6" x2="10.01" y2="6"/>
+          </svg>
+        }
+      </div>
+
+      <!-- Content -->
+      <div class="toast-content">
+        <div class="toast-title">{{ toast.title }}</div>
+        @if (toast.message) {
+          <div class="toast-message">{{ toast.message }}</div>
+        }
+      </div>
+
+      <!-- Dismiss Button -->
+      <button
+        type="button"
+        class="toast-close-btn"
+        (click)="dismiss(toast.id)"
+        aria-label="Close notification"
+      >
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="4" y1="4" x2="12" y2="12"/>
+          <line x1="12" y1="4" x2="4" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  }
+</div>

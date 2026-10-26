@@ -1,0 +1,30 @@
+@if (isAuthRoute()) {
+  <router-outlet></router-outlet>
+  <app-toast />
+} @else {
+  <div class="app-layout">
+    <!-- Left Navigation Sidebar -->
+    <app-sidebar
+      [isCollapsed]="isSidebarCollapsed()"
+      (toggleCollapse)="toggleSidebar()"
+    />
+
+    <!-- Main View Column -->
+    <div class="app-main-column">
+      <!-- Top Header -->
+      <app-header
+        [isSidebarCollapsed]="isSidebarCollapsed()"
+        (toggleSidebar)="toggleSidebar()"
+      />
+
+      <!-- Routed Page Content -->
+      <main class="app-content-container">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+
+    <!-- Global Toast Notifications -->
+    <app-toast />
+  </div>
+}
+

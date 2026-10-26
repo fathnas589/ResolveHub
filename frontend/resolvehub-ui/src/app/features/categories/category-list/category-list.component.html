@@ -1,0 +1,377 @@
+<div class="categories-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left-col">
+      <h1 class="page-title">Categories & SubCategories</h1>
+      <p class="page-subtitle">Organize request classifications, service catalogs, and issue hierarchies</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-secondary" (click)="openCreateSubCategory()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 5v10M5 10h10"/>
+        </svg>
+        <span>Add SubCategory</span>
+      </button>
+      <button type="button" class="btn btn-primary" (click)="openCreateCategory()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 5v10M5 10h10"/>
+        </svg>
+        <span>New Category</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Metric Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">TOTAL CATEGORIES</span>
+        <span class="kpi-value">{{ totalCategories }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">TOTAL SUBCATEGORIES</span>
+        <span class="kpi-value">{{ totalSubCategories }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-emerald">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">ACTIVE CATEGORIES</span>
+        <span class="kpi-value">{{ activeCategoriesCount }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">DEPARTMENTS COVERED</span>
+        <span class="kpi-value">{{ scopedDepartmentsCount }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Toolbar -->
+  <div class="filter-toolbar">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="9" r="6"/>
+        <path d="M13.5 13.5L18 18"/>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search category or subcategory name..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="loadData()"
+      />
+      @if (searchTerm) {
+        <button type="button" class="clear-search-btn" (click)="searchTerm = ''; loadData()">
+          &times;
+        </button>
+      }
+    </div>
+
+    <div class="filter-controls">
+      <!-- Department Selector -->
+      <select
+        class="filter-select"
+        [(ngModel)]="selectedDepartmentGId"
+        (change)="loadData()"
+      >
+        <option value="">All Departments</option>
+        @for (dept of departments; track dept.gId) {
+          <option [value]="dept.gId">{{ dept.departmentName }}</option>
+        }
+      </select>
+
+      <!-- Status Toggle Pills -->
+      <div class="status-pill-group">
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="selectedStatus === 'ALL'"
+          (click)="selectedStatus = 'ALL'; loadData()"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="selectedStatus === 'ACTIVE'"
+          (click)="selectedStatus = 'ACTIVE'; loadData()"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="selectedStatus === 'INACTIVE'"
+          (click)="selectedStatus = 'INACTIVE'; loadData()"
+        >
+          Inactive
+        </button>
+      </div>
+
+      <button type="button" class="btn-refresh" (click)="loadData()" title="Refresh">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Category Hierarchy List -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading category hierarchy...</p>
+    </div>
+  } @else if (categories.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+      </div>
+      <h3 class="empty-title">No categories found</h3>
+      <p class="empty-subtitle">
+        {{ searchTerm || selectedDepartmentGId ? 'Try adjusting your search filters.' : 'Get started by creating your first service category.' }}
+      </p>
+      <button type="button" class="btn btn-primary" (click)="openCreateCategory()">
+        Create Category
+      </button>
+    </div>
+  } @else {
+    <div class="category-tree-list">
+      @for (cat of categories; track cat.gId) {
+        <div class="category-card" [class.collapsed]="!isExpanded(cat.gId)">
+          <!-- Category Card Header -->
+          <div class="category-card-header" (click)="toggleExpand(cat.gId)">
+            <div class="cat-left">
+              <button
+                type="button"
+                class="expand-toggle-btn"
+                [class.rotated]="isExpanded(cat.gId)"
+                aria-label="Toggle SubCategories"
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+
+              <div class="cat-title-block">
+                <span class="cat-name">{{ cat.categoryName }}</span>
+                @if (cat.description) {
+                  <span class="cat-desc">{{ cat.description }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="cat-meta-right" (click)="$event.stopPropagation()">
+              <span class="dept-badge">{{ cat.departmentName }}</span>
+
+              <span class="subcat-count-badge">
+                {{ getSubCategoriesForCategory(cat.gId).length }} SubCategories
+              </span>
+
+              <span class="status-badge" [class.status-active]="cat.isActive" [class.status-inactive]="!cat.isActive">
+                {{ cat.isActive ? 'Active' : 'Inactive' }}
+              </span>
+
+              <div class="action-buttons">
+                <button
+                  type="button"
+                  class="action-btn action-add"
+                  (click)="openCreateSubCategory(cat, $event)"
+                  title="Add SubCategory under this category"
+                >
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3v10M3 8h10"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="action-btn action-edit"
+                  (click)="openEditCategory(cat, $event)"
+                  title="Edit Category"
+                >
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="action-btn action-delete"
+                  (click)="openDeleteCategory(cat, $event)"
+                  title="Delete Category"
+                >
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nested SubCategories Body -->
+          @if (isExpanded(cat.gId)) {
+            <div class="category-card-body">
+              @if (getSubCategoriesForCategory(cat.gId).length === 0) {
+                <div class="no-subcats-hint">
+                  <span>No subcategories configured under this category.</span>
+                  <button type="button" class="link-btn" (click)="openCreateSubCategory(cat)">
+                    + Add first subcategory
+                  </button>
+                </div>
+              } @else {
+                <div class="subcategory-grid">
+                  @for (sub of getSubCategoriesForCategory(cat.gId); track sub.gId) {
+                    <div class="subcategory-card">
+                      <div class="subcat-content">
+                        <div class="subcat-name-row">
+                          <span class="subcat-bullet"></span>
+                          <span class="subcat-title">{{ sub.subCategoryName }}</span>
+                          <span class="status-indicator-dot" [class.dot-active]="sub.isActive" [class.dot-inactive]="!sub.isActive" [title]="sub.isActive ? 'Active' : 'Inactive'"></span>
+                        </div>
+                        @if (sub.description) {
+                          <p class="subcat-desc">{{ sub.description }}</p>
+                        }
+                      </div>
+
+                      <div class="subcat-actions">
+                        <button
+                          type="button"
+                          class="sub-btn-icon"
+                          (click)="openEditSubCategory(sub, $event)"
+                          title="Edit SubCategory"
+                        >
+                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          class="sub-btn-icon text-danger"
+                          (click)="openDeleteSubCategory(sub, $event)"
+                          title="Delete SubCategory"
+                        >
+                          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Category Form Modal -->
+  @if (isCategoryModalOpen) {
+    <app-category-form-modal
+      [category]="selectedCategoryForEdit"
+      (save)="onCategorySaved()"
+      (cancel)="isCategoryModalOpen = false"
+    />
+  }
+
+  <!-- SubCategory Form Modal -->
+  @if (isSubCategoryModalOpen) {
+    <app-subcategory-form-modal
+      [subCategory]="selectedSubCategoryForEdit"
+      [parentCategory]="targetCategoryForNewSub"
+      [allCategories]="categories"
+      (save)="onSubCategorySaved()"
+      (cancel)="isSubCategoryModalOpen = false"
+    />
+  }
+
+  <!-- Delete Category Confirmation Dialog -->
+  @if (isDeleteCategoryModalOpen && categoryToDelete) {
+    <div class="modal-overlay" (click)="isDeleteCategoryModalOpen = false">
+      <div class="modal-card delete-card" (click)="$event.stopPropagation()">
+        <div class="delete-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="delete-title">Delete Category?</h3>
+        <p class="delete-msg">
+          Are you sure you want to delete <strong>"{{ categoryToDelete.categoryName }}"</strong>?
+          This action cannot be undone. Any active subcategories must be reassigned or deleted first.
+        </p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="isDeleteCategoryModalOpen = false" [disabled]="isDeletingCategory">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeleteCategory()" [disabled]="isDeletingCategory">
+            @if (isDeletingCategory) {
+              <span class="spinner-sm"></span>
+              <span>Deleting...</span>
+            } @else {
+              <span>Delete Category</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Delete SubCategory Confirmation Dialog -->
+  @if (isDeleteSubCategoryModalOpen && subCategoryToDelete) {
+    <div class="modal-overlay" (click)="isDeleteSubCategoryModalOpen = false">
+      <div class="modal-card delete-card" (click)="$event.stopPropagation()">
+        <div class="delete-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="delete-title">Delete SubCategory?</h3>
+        <p class="delete-msg">
+          Are you sure you want to delete <strong>"{{ subCategoryToDelete.subCategoryName }}"</strong>?
+        </p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="isDeleteSubCategoryModalOpen = false" [disabled]="isDeletingSubCategory">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeleteSubCategory()" [disabled]="isDeletingSubCategory">
+            @if (isDeletingSubCategory) {
+              <span class="spinner-sm"></span>
+              <span>Deleting...</span>
+            } @else {
+              <span>Delete SubCategory</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

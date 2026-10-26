@@ -1,0 +1,101 @@
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { NotificationDropdownComponent } from '../../../features/notifications/notification-dropdown/notification-dropdown.component';
+
+@Component({
+  selector: 'app-header',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NotificationDropdownComponent],
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.css'
+})
+export class HeaderComponent implements OnInit, OnDestroy {
+  @Input() isSidebarCollapsed = false;
+  @Output() toggleSidebar = new EventEmitter<void>();
+
+  private readonly router = inject(Router);
+  readonly authService = inject(AuthService);
+
+  currentPageTitle = 'Service Desk';
+  currentSection = 'Operations';
+  private routerSub?: Subscription;
+
+  ngOnInit(): void {
+    this.updateBreadcrumbs(this.router.url);
+    this.routerSub = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.updateBreadcrumbs(event.urlAfterRedirects || event.url);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+  }
+
+  private updateBreadcrumbs(url: string): void {
+    const cleanUrl = url.split('?')[0];
+    if (cleanUrl.includes('dashboard')) {
+      this.currentSection = 'Analytics';
+      this.currentPageTitle = 'Overview Dashboard';
+    } else if (cleanUrl.includes('tickets')) {
+      this.currentSection = this.currentRole === 'USER' ? 'Help Center' : 'Operations';
+      this.currentPageTitle = this.currentRole === 'USER' ? 'My Requests' : 'Service Desk';
+    } else if (cleanUrl.includes('departments')) {
+      this.currentSection = 'Administration';
+      this.currentPageTitle = 'Departments';
+    } else if (cleanUrl.includes('categories')) {
+      this.currentSection = 'Administration';
+      this.currentPageTitle = 'Categories & Taxonomies';
+    } else if (cleanUrl.includes('priorities')) {
+      this.currentSection = 'Administration';
+      this.currentPageTitle = 'Priorities';
+    } else if (cleanUrl.includes('sla-policies')) {
+      this.currentSection = 'Administration';
+      this.currentPageTitle = 'SLA Policies';
+    } else if (cleanUrl.includes('users')) {
+      this.currentSection = 'Administration';
+      this.currentPageTitle = 'Team & Users';
+    } else if (cleanUrl.includes('reports')) {
+      this.currentSection = 'Analytics';
+      this.currentPageTitle = 'Performance Reports';
+    } else {
+      this.currentSection = 'Portal';
+      this.currentPageTitle = 'Service Desk';
+    }
+  }
+
+  get currentRole(): string {
+    return this.authService.currentUser()?.role || 'USER';
+  }
+
+  get roleBadgeLabel(): string {
+    const role = this.currentRole;
+    if (role === 'ADMIN') return 'Admin Console';
+    if (role === 'AGENT') return 'Agent Workspace';
+    return 'Employee Portal';
+  }
+
+  onToggle(): void {
+    this.toggleSidebar.emit();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  getUserInitials(): string {
+    const user = this.authService.currentUser();
+    if (!user || !user.fullName) return 'AU';
+    const parts = user.fullName.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return user.fullName.substring(0, 2).toUpperCase();
+  }
+}

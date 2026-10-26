@@ -1,0 +1,124 @@
+<div class="priorities-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left-col">
+      <h1 class="page-title">Priority Guidelines & SLA Matrix</h1>
+      <p class="page-subtitle">Standardized severity criteria, response targets, and urgency classification rules</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-primary" (click)="manageSlaPolicies()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="10" cy="10" r="7"/>
+          <polyline points="10 6 10 10 13 12"/>
+        </svg>
+        <span>Configure SLA Policies</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Priority Cards Grid -->
+  <div class="priority-grid">
+    @for (p of priorities; track p.code) {
+      <div class="priority-card" [ngClass]="p.badgeClass">
+        <div class="card-header-bar">
+          <div class="badge-title-box">
+            <span class="p-badge">{{ p.code }}</span>
+            <h3 class="p-name">{{ p.name }}</h3>
+          </div>
+          <div class="active-count-badge" [title]="p.activeTicketCount + ' tickets currently in progress with this priority'">
+            <span class="count-num">{{ p.activeTicketCount }}</span>
+            <span class="count-txt">Active</span>
+          </div>
+        </div>
+
+        <p class="p-desc">{{ p.description }}</p>
+
+        <!-- SLA Targets Box -->
+        <div class="targets-box">
+          <div class="target-item">
+            <span class="target-label">FIRST RESPONSE</span>
+            <span class="target-val">{{ p.responseTarget }}</span>
+          </div>
+          <div class="target-divider"></div>
+          <div class="target-item">
+            <span class="target-label">RESOLUTION TARGET</span>
+            <span class="target-val">{{ p.resolutionTarget }}</span>
+          </div>
+        </div>
+
+        <div class="escalation-notice">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>{{ p.escalationNotice }}</span>
+        </div>
+
+        <!-- Criteria Checklist -->
+        <div class="criteria-section">
+          <span class="criteria-heading">CLASSIFICATION CRITERIA</span>
+          <ul class="criteria-list">
+            @for (crit of p.criteria; track crit) {
+              <li>
+                <svg class="check-icon" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                </svg>
+                <span>{{ crit }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Footer Action -->
+        <div class="card-footer">
+          <button type="button" class="view-tickets-btn" (click)="viewTickets(p.code)">
+            <span>View Active {{ p.code }} Tickets</span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 14l5-5-5-5"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Impact vs Urgency Matrix Card -->
+  <div class="matrix-card">
+    <div class="matrix-header">
+      <div class="matrix-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18M9 21V9"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="matrix-title">ITIL Impact vs Urgency Calculation Matrix</h3>
+        <p class="matrix-subtitle">ResolveHub computes priority automatically based on business impact and request urgency</p>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>BUSINESS IMPACT \ URGENCY</th>
+            <th>CRITICAL / IMMEDIATE</th>
+            <th>HIGH / TIME-SENSITIVE</th>
+            <th>NORMAL / ROUTINE</th>
+            <th>LOW / MINOR</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of matrixRows; track row.impact) {
+            <tr>
+              <td class="impact-col">{{ row.impact }}</td>
+              <td><span class="matrix-badge badge-urgent">{{ row.urgent }}</span></td>
+              <td><span class="matrix-badge badge-high">{{ row.high }}</span></td>
+              <td><span class="matrix-badge badge-medium">{{ row.medium }}</span></td>
+              <td><span class="matrix-badge badge-low">{{ row.low }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

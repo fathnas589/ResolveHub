@@ -1,0 +1,392 @@
+<div class="drawer-backdrop" (click)="close.emit()">
+  <div class="drawer-container" (click)="$event.stopPropagation()">
+    <!-- Drawer Top Header -->
+    <div class="drawer-header">
+      <div class="header-left-meta">
+        <button type="button" class="btn-back" (click)="close.emit()" title="Back to list">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M15 10H5M10 15l-5-5 5-5"/>
+          </svg>
+        </button>
+        @if (ticket) {
+          <div class="ticket-header-title">
+            <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+            <span class="type-pill" [attr.data-type]="ticket.ticketType">{{ ticket.ticketType }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="header-right-actions">
+        @if (ticket) {
+          <!-- Action: Change Status (Staff only) -->
+          @if (canChangeStatus()) {
+            <button type="button" class="btn btn-outline" (click)="showStatusModal = true">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              <span>Update Status</span>
+            </button>
+          }
+
+          <!-- User Quick Actions (When Ticket is RESOLVED) -->
+          @if (canUserClose()) {
+            <button type="button" class="btn btn-primary" (click)="closeTicketAsUser()">
+              <span>✓ Accept & Close</span>
+            </button>
+          }
+          @if (canUserReopen()) {
+            <button type="button" class="btn btn-outline" (click)="reopenTicketAsUser()">
+              <span>↺ Reopen Request</span>
+            </button>
+          }
+
+          <!-- Action: Assign Agent (Admin / Agent only) -->
+          @if (canAssign()) {
+            <button type="button" class="btn btn-outline" (click)="showAssignModal = true">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M16 16v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1"/>
+                <circle cx="10" cy="7" r="4"/>
+              </svg>
+              <span>Assign</span>
+            </button>
+          }
+
+          <!-- Action: Delete (Admin only) -->
+          @if (authService.isAdmin()) {
+            <button type="button" class="btn btn-danger-outline" (click)="deleteTicket()" title="Soft delete ticket">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M4 6h12M8 6V4h4v2M6 6v10a2 2 0 002 2h4a2 2 0 002-2V6"/>
+              </svg>
+            </button>
+          }
+        }
+        <button type="button" class="btn-close" (click)="close.emit()" aria-label="Close drawer">&times;</button>
+      </div>
+    </div>
+
+    <!-- Drawer Content Body -->
+    @if (isLoading) {
+      <div class="loading-state-box">
+        <div class="spinner"></div>
+        <span>Loading ticket details...</span>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-box">
+        <span>{{ errorMessage }}</span>
+        <button type="button" class="btn btn-sm btn-primary" (click)="loadTicket()">Retry</button>
+      </div>
+    } @else if (ticket) {
+      <div class="drawer-body">
+        <!-- Ticket Information Card -->
+        <div class="ticket-overview-card">
+          <div class="overview-badges">
+            <span class="status-badge" [attr.data-status]="ticket.status">{{ ticket.status }}</span>
+            <span class="priority-badge" [attr.data-priority]="ticket.priority">{{ ticket.priority }} Priority</span>
+            <span class="created-meta">Created {{ ticket.created | date:'medium' }}</span>
+          </div>
+
+          <h2 class="ticket-subject">{{ ticket.subject }}</h2>
+          <p class="ticket-desc">{{ ticket.description }}</p>
+
+          <!-- Breadcrumbs & Assignment Grid -->
+          <div class="overview-meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Routing Hierarchy</span>
+              <div class="hierarchy-pill">
+                <span class="dept-name">{{ ticket.departmentName }}</span>
+                <span class="sep">&rsaquo;</span>
+                <span class="cat-name">{{ ticket.categoryName }}</span>
+                @if (ticket.subCategoryName) {
+                  <span class="sep">&rsaquo;</span>
+                  <span class="subcat-name">{{ ticket.subCategoryName }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Created By</span>
+              <div class="user-pill">
+                <span class="avatar-sm">{{ getInitials(ticket.createdByFullName) }}</span>
+                <span class="name">{{ ticket.createdByFullName }}</span>
+              </div>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Assigned Agent</span>
+              <div class="user-pill">
+                @if (ticket.assignedToFullName) {
+                  <span class="avatar-sm avatar-agent">{{ getInitials(ticket.assignedToFullName) }}</span>
+                  <span class="name">{{ ticket.assignedToFullName }}</span>
+                } @else {
+                  <span class="unassigned-text">Unassigned</span>
+                }
+              </div>
+            </div>
+
+            @if (ticket.closedAt) {
+              <div class="meta-item">
+                <span class="meta-label">Closed At</span>
+                <span class="closed-date">{{ ticket.closedAt | date:'medium' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Dedicated SLA Tracking & Health Card (Staff only) -->
+        @if (ticketSla && authService.isStaff()) {
+          <div class="sla-overview-card" [attr.data-sla]="ticketSla.slaHealth">
+            <div class="sla-card-header">
+              <div class="sla-header-info">
+                <div class="sla-icon-wrapper">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="sla-policy-heading">
+                    SLA Policy: <strong>{{ ticketSla.slaPolicyName || 'Default Policy' }}</strong>
+                  </h4>
+                  <span class="sla-health-badge" [attr.data-sla]="ticketSla.slaHealth">
+                    <span class="sla-pulse-dot"></span>
+                    {{ formatSlaHealth(ticketSla.slaHealth) }}
+                  </span>
+                </div>
+              </div>
+
+              @if (ticketSla.escalationDueAt) {
+                <div class="sla-warning-note">
+                  <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  <span>Warning margin active</span>
+                </div>
+              }
+            </div>
+
+            <div class="sla-metrics-grid">
+              <!-- First Response -->
+              <div class="sla-metric-box">
+                <div class="sla-box-top">
+                  <span class="sla-metric-title">First Response</span>
+                  <span class="sla-target-time">{{ formatDuration(ticketSla.firstResponseMinutes) }} target</span>
+                </div>
+                <div class="sla-metric-body">
+                  @if (ticketSla.firstRespondedAt) {
+                    <span class="sla-tag tag-met">
+                      ✓ Responded {{ ticketSla.firstRespondedAt | date:'short' }}
+                    </span>
+                  } @else if (ticketSla.firstResponseBreached) {
+                    <span class="sla-tag tag-breached">
+                      ✗ Breached (Deadline: {{ ticketSla.firstResponseDueAt | date:'short' }})
+                    </span>
+                  } @else {
+                    <span class="sla-tag tag-pending">
+                      ⏳ Due in {{ formatRemainingTime(ticketSla.firstResponseRemainingSeconds) }} ({{ ticketSla.firstResponseDueAt | date:'shortTime' }})
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Resolution -->
+              <div class="sla-metric-box">
+                <div class="sla-box-top">
+                  <span class="sla-metric-title">Resolution Target</span>
+                  <span class="sla-target-time">{{ formatDuration(ticketSla.resolutionMinutes) }} target</span>
+                </div>
+                <div class="sla-metric-body">
+                  @if (ticketSla.resolvedAt) {
+                    <span class="sla-tag" [class.tag-met]="!ticketSla.resolutionBreached" [class.tag-breached]="ticketSla.resolutionBreached">
+                      {{ ticketSla.resolutionBreached ? '✗ Resolved Late' : '✓ Resolved On Time' }} ({{ ticketSla.resolvedAt | date:'short' }})
+                    </span>
+                  } @else if (ticketSla.resolutionBreached) {
+                    <span class="sla-tag tag-breached">
+                      ✗ Resolution Breached (Deadline: {{ ticketSla.resolutionDueAt | date:'short' }})
+                    </span>
+                  } @else {
+                    <span class="sla-tag tag-pending">
+                      ⏳ Target: {{ formatRemainingTime(ticketSla.resolutionRemainingSeconds) }} left (Due {{ ticketSla.resolutionDueAt | date:'short' }})
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Detail Tabs: Conversation vs History -->
+        <div class="tabs-container">
+          <div class="tabs-nav">
+            <button
+              type="button"
+              class="tab-btn"
+              [class.active]="activeTab === 'comments'"
+              (click)="activeTab = 'comments'"
+            >
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M17 12a3 3 0 0 1-3 3H6l-3 3V5a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v7z"/>
+              </svg>
+              <span>Activity & Comments</span>
+              <span class="count-badge">{{ comments.length }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="tab-btn"
+              [class.active]="activeTab === 'history'"
+              (click)="activeTab = 'history'"
+            >
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <circle cx="10" cy="10" r="7"/>
+                <path d="M10 6v4l3 2"/>
+              </svg>
+              <span>Audit Timeline</span>
+              <span class="count-badge">{{ history.length }}</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: COMMENTS / CONVERSATION -->
+          @if (activeTab === 'comments') {
+            <div class="tab-pane comments-tab">
+              <!-- Compose New Comment Box -->
+              <div class="comment-compose-card">
+                <textarea
+                  class="comment-textarea"
+                  rows="3"
+                  [(ngModel)]="newCommentText"
+                  placeholder="Write a reply or update..."
+                  [disabled]="isSubmittingComment"
+                ></textarea>
+
+                <div class="compose-actions">
+                  <!-- Internal note toggle (Staff only) -->
+                  @if (authService.isStaff()) {
+                    <label class="internal-toggle-label" title="Visible only to Admins and Agents">
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="isInternalComment"
+                        [disabled]="isSubmittingComment"
+                      />
+                      <span class="lock-icon">&#128274;</span>
+                      <span>Staff Internal Note</span>
+                    </label>
+                  } @else {
+                    <span class="public-note-label">Public response</span>
+                  }
+
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    (click)="submitComment()"
+                    [disabled]="isSubmittingComment || !newCommentText.trim()"
+                  >
+                    @if (isSubmittingComment) {
+                      <span>Posting...</span>
+                    } @else {
+                      <span>Send Reply</span>
+                    }
+                  </button>
+                </div>
+              </div>
+
+              <!-- Comments Feed List -->
+              @if (isLoadingComments) {
+                <div class="loading-state-box">Loading activity...</div>
+              } @else if (comments.length === 0) {
+                <div class="empty-comments">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <p>No comments or replies yet on this ticket.</p>
+                </div>
+              } @else {
+                <div class="comments-stream">
+                  @for (c of comments; track c.gId) {
+                    <div class="comment-bubble-card" [class.is-internal]="c.isInternal">
+                      <div class="comment-header">
+                        <div class="comment-author-box">
+                          <span class="avatar-sm">{{ getInitials(c.userFullName) }}</span>
+                          <span class="author-name">{{ c.userFullName }}</span>
+                          <span class="role-pill" [attr.data-role]="c.userRole">{{ c.userRole }}</span>
+                          @if (c.isInternal) {
+                            <span class="internal-badge">&#128274; STAFF NOTE</span>
+                          }
+                        </div>
+                        <span class="comment-date">{{ c.created | date:'short' }}</span>
+                      </div>
+                      <div class="comment-body">
+                        {{ c.commentText }}
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- TAB 2: AUDIT HISTORY TIMELINE -->
+          @if (activeTab === 'history') {
+            <div class="tab-pane history-tab">
+              @if (isLoadingHistory) {
+                <div class="loading-state-box">Loading audit history...</div>
+              } @else if (history.length === 0) {
+                <div class="empty-comments">
+                  <p>No audit history recorded.</p>
+                </div>
+              } @else {
+                <div class="timeline-container">
+                  @for (item of history; track item.gId) {
+                    <div class="timeline-item">
+                      <div class="timeline-bullet" [attr.data-action]="item.actionType"></div>
+                      <div class="timeline-content">
+                        <div class="timeline-meta">
+                          <span class="action-tag" [attr.data-action]="item.actionType">{{ item.actionType }}</span>
+                          <span class="timeline-date">{{ item.created | date:'medium' }}</span>
+                        </div>
+                        <div class="timeline-performer">
+                          by <strong>{{ item.performedByFullName }}</strong> ({{ item.performedByUserName }})
+                        </div>
+                        @if (item.oldValue || item.newValue) {
+                          <div class="timeline-values">
+                            @if (item.oldValue) {
+                              <span class="old-val">{{ item.oldValue }}</span>
+                              <span class="arrow">&rarr;</span>
+                            }
+                            <span class="new-val">{{ item.newValue }}</span>
+                          </div>
+                        }
+                        @if (item.remarks) {
+                          <div class="timeline-remarks">
+                            <em>&ldquo;{{ item.remarks }}&rdquo;</em>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal: Status Update -->
+@if (showStatusModal && ticket) {
+  <app-ticket-status-modal
+    [ticket]="ticket"
+    (close)="showStatusModal = false"
+    (statusUpdated)="onStatusUpdated($event)"
+  ></app-ticket-status-modal>
+}
+
+<!-- Modal: Assign Agent -->
+@if (showAssignModal && ticket) {
+  <app-ticket-assign-modal
+    [ticket]="ticket"
+    (close)="showAssignModal = false"
+    (assigned)="onTicketAssigned($event)"
+  ></app-ticket-assign-modal>
+}

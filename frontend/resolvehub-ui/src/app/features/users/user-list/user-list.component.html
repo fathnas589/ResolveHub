@@ -1,0 +1,380 @@
+<div class="users-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left-col">
+      <h1 class="page-title">User Master Administration</h1>
+      <p class="page-subtitle">Manage company staff, support desk agents, permissions, and accounts</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-primary" (click)="openCreateUser()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 5v10M5 10h10"/>
+        </svg>
+        <span>New User</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Metric Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">TOTAL USERS</span>
+        <span class="kpi-value">{{ totalUsers }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-rose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">ADMINISTRATORS</span>
+        <span class="kpi-value">{{ adminCount }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+          <line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">SERVICE DESK AGENTS</span>
+        <span class="kpi-value">{{ agentCount }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-box kpi-emerald">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">STANDARD REQUESTERS</span>
+        <span class="kpi-value">{{ standardUserCount }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card" [class.kpi-card-highlight]="pendingApprovalCount > 0">
+      <div class="kpi-icon-box kpi-amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">PENDING APPROVAL</span>
+        <span class="kpi-value">{{ pendingApprovalCount }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Toolbar -->
+  <div class="filter-toolbar">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="9" r="6"/>
+        <path d="M13.5 13.5L18 18"/>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search name, username, or email..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="onSearch()"
+      />
+      @if (searchTerm) {
+        <button type="button" class="clear-search-btn" (click)="searchTerm = ''; onSearch()">
+          &times;
+        </button>
+      }
+    </div>
+
+    <div class="filter-controls">
+      <!-- Role Filter -->
+      <select class="filter-select" [(ngModel)]="selectedRole" (change)="onSearch()">
+        <option value="">All Roles</option>
+        <option value="ADMIN">ADMIN</option>
+        <option value="AGENT">AGENT</option>
+        <option value="USER">USER</option>
+      </select>
+
+      <!-- Department Filter -->
+      <select class="filter-select" [(ngModel)]="selectedDepartmentGId" (change)="onSearch()">
+        <option value="">All Departments</option>
+        @for (dept of departments; track dept.gId) {
+          <option [value]="dept.gId">{{ dept.departmentName }}</option>
+        }
+      </select>
+
+      <!-- Status Toggle Pills -->
+      <div class="status-pill-group">
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="selectedStatus === 'ALL'"
+          (click)="selectedStatus = 'ALL'; onSearch()"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="selectedStatus === 'ACTIVE'"
+          (click)="selectedStatus = 'ACTIVE'; onSearch()"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="selectedStatus === 'PENDING'"
+          (click)="selectedStatus = 'PENDING'; onSearch()"
+        >
+          Pending Approval ({{ pendingApprovalCount }})
+        </button>
+      </div>
+
+      <button type="button" class="btn-refresh" (click)="onSearch()" title="Refresh">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Users Data Table Card -->
+  <div class="table-card">
+    @if (isLoading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading user directory...</p>
+      </div>
+    } @else if (users.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">No users found</h3>
+        <p class="empty-subtitle">Try adjusting your filters or create a new user account.</p>
+        <button type="button" class="btn btn-primary" (click)="openCreateUser()">Create User</button>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>USER</th>
+              <th>CONTACT</th>
+              <th>ROLE</th>
+              <th>DEPARTMENT</th>
+              <th>STATUS</th>
+              <th>JOINED</th>
+              <th class="text-right">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users; track user.gId) {
+              <tr class="table-row">
+                <!-- User Initials & Full Name -->
+                <td class="user-col">
+                  <div class="user-avatar-initials" [attr.data-role]="user.roleCode">
+                    {{ getUserInitials(user.fullName) }}
+                  </div>
+                  <div class="user-names">
+                    <span class="full-name">{{ user.fullName }}</span>
+                    <span class="username">&#64;{{ user.userName }}</span>
+                  </div>
+                </td>
+
+                <!-- Email & Phone -->
+                <td>
+                  <div class="contact-info">
+                    <span class="email-text">{{ user.email }}</span>
+                    @if (user.phone) {
+                      <span class="phone-text">{{ user.phone }}</span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Role Badge -->
+                <td>
+                  <span class="role-badge" [attr.data-role]="user.roleCode">
+                    {{ user.roleCode }}
+                  </span>
+                </td>
+
+                <!-- Department -->
+                <td>
+                  @if (user.departmentName) {
+                    <span class="dept-badge">{{ user.departmentName }}</span>
+                  } @else {
+                    <span class="text-muted">None</span>
+                  }
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span class="status-pill" [class.status-active]="user.isActive" [class.status-pending]="!user.isActive">
+                    {{ user.isActive ? 'Active' : 'Pending Approval' }}
+                  </span>
+                </td>
+
+                <!-- Created Date -->
+                <td class="date-col">
+                  {{ user.created | date:'shortDate' }}
+                </td>
+
+                <!-- Action Buttons -->
+                <td class="text-right">
+                  <div class="row-actions">
+                    @if (!user.isActive) {
+                      <button
+                        type="button"
+                        class="action-btn action-approve"
+                        [disabled]="approvingGId === user.gId"
+                        (click)="approveUser(user)"
+                        title="Approve User Account"
+                      >
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2">
+                          <polyline points="4 11 8 15 16 6" />
+                        </svg>
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="action-btn action-edit"
+                      (click)="openEditUser(user)"
+                      title="Edit User Profile"
+                    >
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-btn action-key"
+                      (click)="openChangePassword(user)"
+                      title="Reset / Change Password"
+                    >
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="9" width="14" height="9" rx="2" ry="2"/>
+                        <path d="M6 9V6a4 4 0 0 1 8 0v3"/>
+                      </svg>
+                    </button>
+                    @if (user.isActive) {
+                      <button
+                        type="button"
+                        class="action-btn action-delete"
+                        (click)="openDeleteUser(user)"
+                        title="Deactivate Account"
+                      >
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                          <circle cx="10" cy="10" r="8"/>
+                          <line x1="4" y1="4" x2="16" y2="16"/>
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Pagination Footer -->
+      <div class="table-footer">
+        <div class="footer-info">
+          Showing page {{ pageNumber }} of {{ totalPages || 1 }} ({{ totalCount }} total users)
+        </div>
+        <div class="pagination-buttons">
+          <button
+            type="button"
+            class="page-btn"
+            [disabled]="pageNumber <= 1"
+            (click)="onPageChange(pageNumber - 1)"
+          >
+            Previous
+          </button>
+          <span class="current-page-chip">{{ pageNumber }}</span>
+          <button
+            type="button"
+            class="page-btn"
+            [disabled]="pageNumber >= totalPages"
+            (click)="onPageChange(pageNumber + 1)"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- User Form Modal -->
+  @if (isUserModalOpen) {
+    <app-user-form-modal
+      [user]="selectedUserForEdit"
+      (save)="onUserSaved()"
+      (cancel)="isUserModalOpen = false"
+    />
+  }
+
+  <!-- Change Password Modal -->
+  @if (isPasswordModalOpen && selectedUserForPassword) {
+    <app-change-password-modal
+      [user]="selectedUserForPassword"
+      (save)="onPasswordSaved()"
+      (cancel)="isPasswordModalOpen = false"
+    />
+  }
+
+  <!-- Deactivate Confirmation Dialog -->
+  @if (isDeleteModalOpen && userToDelete) {
+    <div class="modal-overlay" (click)="isDeleteModalOpen = false">
+      <div class="modal-card delete-card" (click)="$event.stopPropagation()">
+        <div class="delete-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="delete-title">Deactivate User?</h3>
+        <p class="delete-msg">
+          Are you sure you want to deactivate <strong>"{{ userToDelete.fullName }}"</strong>?
+          They will no longer be able to log in or be assigned new tickets.
+        </p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="isDeleteModalOpen = false" [disabled]="isDeleting">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeleteUser()" [disabled]="isDeleting">
+            @if (isDeleting) {
+              <span class="spinner-sm"></span>
+              <span>Deactivating...</span>
+            } @else {
+              <span>Deactivate User</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

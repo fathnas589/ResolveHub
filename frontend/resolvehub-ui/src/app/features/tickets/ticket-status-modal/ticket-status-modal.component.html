@@ -1,0 +1,91 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <h3 class="modal-title">Change Ticket Status</h3>
+        <span class="ticket-tag">{{ ticket.ticketNumber }}</span>
+      </div>
+      <button type="button" class="btn-close" (click)="close.emit()" aria-label="Close modal">&times;</button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+
+      <div class="status-summary-box">
+        <div class="summary-line">
+          <span class="summary-label">Current Status:</span>
+          <span class="status-badge" [attr.data-status]="ticket.status">{{ ticket.status }}</span>
+        </div>
+        <div class="summary-line">
+          <span class="summary-label">Subject:</span>
+          <span class="summary-value">{{ ticket.subject }}</span>
+        </div>
+      </div>
+
+      <!-- Valid Next Status Selection -->
+      <div class="form-group">
+        <label for="statusSelect" class="form-label">
+          Target Status <span class="text-danger">*</span>
+        </label>
+
+        @if (validNextStatuses.length === 0) {
+          <div class="terminal-state-banner">
+            This ticket is currently in terminal state <strong>{{ ticket.status }}</strong>. No further status changes are allowed.
+          </div>
+        } @else {
+          <select
+            id="statusSelect"
+            class="form-control"
+            [(ngModel)]="selectedStatus"
+            [disabled]="isSubmitting"
+          >
+            @for (st of validNextStatuses; track st) {
+              <option [value]="st">Transition to: {{ st }}</option>
+            }
+          </select>
+          <small class="text-muted">
+            Only transitions permitted by ResolveHub workflow policies are listed.
+          </small>
+        }
+      </div>
+
+      <!-- Remarks / Reason -->
+      <div class="form-group">
+        <label for="statusComments" class="form-label">
+          Transition Remarks / Resolution Notes
+        </label>
+        <textarea
+          id="statusComments"
+          class="form-control textarea"
+          rows="3"
+          [(ngModel)]="comments"
+          placeholder="State reason for transition or summarize resolution work done..."
+          [disabled]="isSubmitting || validNextStatuses.length === 0"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="close.emit()" [disabled]="isSubmitting">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="submit()"
+        [disabled]="isSubmitting || !selectedStatus || validNextStatuses.length === 0"
+      >
+        @if (isSubmitting) {
+          <span>Updating...</span>
+        } @else {
+          <span>Apply Status Change</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

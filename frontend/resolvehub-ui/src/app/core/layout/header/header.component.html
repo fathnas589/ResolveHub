@@ -1,0 +1,90 @@
+<header class="app-header" [attr.data-role]="currentRole">
+  <!-- Dynamic Top Role Accent Line -->
+  <div class="header-role-accent" [attr.data-role]="currentRole"></div>
+
+  <div class="header-inner">
+    <!-- Left: Sidebar Toggle & Dynamic Breadcrumb -->
+    <div class="header-left">
+      <button
+        type="button"
+        class="sidebar-toggle-btn"
+        (click)="onToggle()"
+        [title]="isSidebarCollapsed ? 'Expand navigation sidebar' : 'Collapse navigation sidebar'"
+        aria-label="Toggle navigation sidebar"
+      >
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="5" x2="17" y2="5"/>
+          <line x1="3" y1="10" x2="17" y2="10"/>
+          <line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+
+      <!-- Role Environment Badge -->
+      <div class="role-workspace-pill" [attr.data-role]="currentRole">
+        <span class="role-dot"></span>
+        <span class="role-text">{{ roleBadgeLabel }}</span>
+      </div>
+
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumb-nav" aria-label="Breadcrumbs">
+        <span class="breadcrumb-item">{{ currentSection }}</span>
+        <svg class="breadcrumb-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 12 10 8 6 4"/>
+        </svg>
+        <span class="breadcrumb-item active">{{ currentPageTitle }}</span>
+      </nav>
+    </div>
+
+    <!-- Right: Company, Notifications, User Profile, Sign Out -->
+    <div class="header-right">
+      <!-- Company Tenant Badge -->
+      <div class="company-badge" title="Active Tenant: ResolveHub Enterprise (ID #1)">
+        <div class="company-icon-box">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 17V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12"/>
+            <path d="M9 17v-4a1 1 0 0 1 1-1h0a1 1 0 0 1 1 1v4"/>
+            <path d="M7 7h2M11 7h2M7 10h2M11 10h2"/>
+          </svg>
+        </div>
+        <div class="company-text">
+          <span class="company-label">ORGANIZATION</span>
+          <span class="company-name">ResolveHub Demo</span>
+        </div>
+      </div>
+
+      <!-- Notifications Center -->
+      <app-notification-dropdown />
+
+      <div class="header-divider"></div>
+
+      <!-- User Profile Details Capsule -->
+      <div class="header-user-card" [title]="'Logged in as ' + (authService.currentUser()?.fullName || 'User')">
+        <div class="header-user-avatar" [attr.data-role]="currentRole">
+          {{ getUserInitials() }}
+        </div>
+        <div class="header-user-info">
+          <span class="header-user-name">{{ authService.currentUser()?.fullName || 'User' }}</span>
+          <span class="header-user-role badge-role" [attr.data-role]="currentRole">
+            {{ currentRole }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Sign Out Button -->
+      <button
+        type="button"
+        class="header-logout-btn"
+        (click)="logout()"
+        title="Sign Out of ResolveHub"
+        aria-label="Sign Out"
+      >
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 16l4-4-4-4"/>
+          <path d="M17 12H7"/>
+          <path d="M9 19H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>
+        </svg>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </div>
+</header>

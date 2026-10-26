@@ -1,0 +1,101 @@
+<div class="login-page">
+  <div class="login-wrapper">
+    <!-- Brand / Header -->
+    <div class="login-brand-header">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">ResolveHub</h1>
+      <p class="brand-tagline">Enterprise Operations & SLA Service Desk</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+      <div class="card-header-group">
+        <h2 class="card-heading">Sign in to your account</h2>
+        <p class="card-subheading">Enter your credentials to access ResolveHub</p>
+      </div>
+
+      <!-- Error Alert -->
+      @if (errorMessage) {
+        <div class="alert alert-danger">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <!-- Manual Login Form -->
+      <form (ngSubmit)="onSubmit()" class="manual-login-form">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="login-company">Company ID</label>
+            <input
+              id="login-company"
+              type="number"
+              class="form-control"
+              [(ngModel)]="companyId"
+              name="companyId"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-user">Username or Email</label>
+            <input
+              id="login-user"
+              type="text"
+              class="form-control"
+              placeholder="e.g. admin or username"
+              [(ngModel)]="userNameOrEmail"
+              name="userNameOrEmail"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-pass">Password</label>
+          <input
+            id="login-pass"
+            type="password"
+            class="form-control"
+            placeholder="••••••••"
+            [(ngModel)]="password"
+            name="password"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn-submit"
+          [disabled]="isLoading"
+        >
+          @if (isLoading) {
+            <span class="spinner-sm"></span>
+            <span>Signing In...</span>
+          } @else {
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 16l4-4-4-4m4 4H3"/>
+              <path d="M16 4h2a2 2 0 012 2v8a2 2 0 01-2 2h-2"/>
+            </svg>
+            <span>Sign In to ResolveHub</span>
+          }
+        </button>
+
+        <div class="register-prompt">
+          <span>New user needing assistance?</span>
+          <a routerLink="/register" class="register-link">Register Self-Service Account &rarr;</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <span>ResolveHub Enterprise Platform &bull; Multi-Tenant Architecture</span>
+    </div>
+  </div>
+</div>

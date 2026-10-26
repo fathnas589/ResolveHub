@@ -1,0 +1,70 @@
+<div class="user-profile-page">
+  <div class="page-top-nav">
+    <a routerLink="/user/dashboard" class="back-link">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 10H5M10 15l-5-5 5-5"/>
+      </svg>
+      <span>Back to Dashboard</span>
+    </a>
+  </div>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="avatar-large">{{ userInitials }}</div>
+      <div class="header-details">
+        <div class="badge-role">Requester &bull; Employee Account</div>
+        <h1 class="user-fullname">{{ user?.fullName || 'ResolveHub Employee' }}</h1>
+        <p class="user-email-subtitle">{{ user?.email || user?.userName }}</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="profile-sections">
+      <h2 class="section-title">Identity & Account Details</h2>
+
+      <div class="details-grid">
+        <div class="detail-box">
+          <span class="detail-label">Full Name</span>
+          <span class="detail-value">{{ user?.fullName || 'Not provided' }}</span>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">Username</span>
+          <span class="detail-value font-mono">{{ user?.userName }}</span>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">Email Address</span>
+          <span class="detail-value font-mono">{{ user?.email || 'N/A' }}</span>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">Assigned Role</span>
+          <span class="detail-value role-badge">{{ user?.role || 'USER' }}</span>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">Organization / Company ID</span>
+          <span class="detail-value">Company #{{ user?.companyId || 1 }}</span>
+        </div>
+
+        <div class="detail-box">
+          <span class="detail-label">Home Department</span>
+          <span class="detail-value">{{ user?.departmentName || 'General / Unassigned' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Security & Scope Notice -->
+    <div class="scope-notice">
+      <div class="notice-icon">🛡️</div>
+      <div class="notice-content">
+        <strong>Self-Service Scope Active</strong>
+        <p>Your account is configured with standard employee requester permissions. You can raise requests, monitor ticket resolution, and add public replies to your active tickets. Administrative operations and user management are handled by company IT administrators.</p>
+      </div>
+    </div>
+  </div>
+</div>

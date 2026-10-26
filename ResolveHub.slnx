@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ResolveHub.Api/ResolveHub.Api.csproj" />
+    <Project Path="src/ResolveHub.Core/ResolveHub.Core.csproj" />
+    <Project Path="src/ResolveHub.DataAccess/ResolveHub.DataAccess.csproj" />
+    <Project Path="src/ResolveHub.DbInitializer/ResolveHub.DbInitializer.csproj" />
+    <Project Path="src/ResolveHub.Services/ResolveHub.Services.csproj" />
+  </Folder>
+</Solution>

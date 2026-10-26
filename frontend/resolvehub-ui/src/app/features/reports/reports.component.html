@@ -1,0 +1,283 @@
+<div class="reports-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left-col">
+      <h1 class="page-title">SLA Analytics & Executive Reports</h1>
+      <p class="page-subtitle">Measure resolution compliance, departmental throughput, and team SLA performance</p>
+    </div>
+    <div class="header-actions">
+      <!-- Period Selector -->
+      <div class="period-pill-group">
+        <button
+          type="button"
+          class="period-btn"
+          [class.active]="selectedPeriod === '7D'"
+          (click)="onPeriodChange('7D')"
+        >
+          Last 7 Days
+        </button>
+        <button
+          type="button"
+          class="period-btn"
+          [class.active]="selectedPeriod === '30D'"
+          (click)="onPeriodChange('30D')"
+        >
+          Last 30 Days
+        </button>
+        <button
+          type="button"
+          class="period-btn"
+          [class.active]="selectedPeriod === '90D'"
+          (click)="onPeriodChange('90D')"
+        >
+          Last 90 Days
+        </button>
+        <button
+          type="button"
+          class="period-btn"
+          [class.active]="selectedPeriod === 'ALL'"
+          (click)="onPeriodChange('ALL')"
+        >
+          All Time
+        </button>
+      </div>
+
+      <!-- Export CSV Button -->
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="exportCsv()"
+        [disabled]="isExporting"
+        title="Download CSV Audit Report"
+      >
+        @if (isExporting) {
+          <span class="spinner-sm"></span>
+          <span>Generating...</span>
+        } @else {
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 16v1a2 2 0 002 2h8a2 2 0 002-2v-1M7 10l3 3m0 0l3-3m-3 3V3"/>
+          </svg>
+          <span>Export CSV Audit</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Calculating SLA performance metrics...</p>
+    </div>
+  } @else if (reportData) {
+    <!-- Executive KPI Grid -->
+    <div class="kpi-grid">
+      <!-- Overall Compliance -->
+      <div class="kpi-card compliance-card">
+        <div class="kpi-icon-box kpi-emerald">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">SLA COMPLIANCE RATE</span>
+          <span class="kpi-value text-emerald">{{ reportData.summary.compliancePercentage | number:'1.1-1' }}%</span>
+        </div>
+      </div>
+
+      <!-- Audited Tickets -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">TICKETS AUDITED</span>
+          <span class="kpi-value">{{ reportData.summary.totalTickets }}</span>
+        </div>
+      </div>
+
+      <!-- Resolved On Time -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">RESOLVED TICKETS</span>
+          <span class="kpi-value">{{ reportData.summary.resolvedTickets }}</span>
+        </div>
+      </div>
+
+      <!-- SLA Breaches -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-rose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">SLA BREACHES</span>
+          <span class="kpi-value text-rose">{{ reportData.summary.breachedTickets }}</span>
+        </div>
+      </div>
+
+      <!-- Avg Response Hours -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-indigo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">AVG FIRST RESPONSE</span>
+          <span class="kpi-value">{{ reportData.summary.avgFirstResponseHours | number:'1.1-1' }}h</span>
+        </div>
+      </div>
+
+      <!-- Avg Resolution Hours -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box kpi-amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">AVG RESOLUTION (MTTR)</span>
+          <span class="kpi-value">{{ reportData.summary.avgResolutionHours | number:'1.1-1' }}h</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Department Performance Table -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon-badge kpi-blue">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 18V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="section-title">Department SLA Performance</h3>
+          <p class="section-subtitle">Resolution compliance and throughput aggregated by operational team</p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>DEPARTMENT</th>
+              <th>VOLUME</th>
+              <th>RESOLVED</th>
+              <th>BREACHED</th>
+              <th>COMPLIANCE RATE</th>
+              <th>AVG RESOLUTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (dept of reportData.departments; track dept.departmentName) {
+              <tr>
+                <td class="dept-col">{{ dept.departmentName }}</td>
+                <td>{{ dept.totalTickets }}</td>
+                <td><span class="count-badge resolved">{{ dept.resolvedCount }}</span></td>
+                <td>
+                  <span class="count-badge" [class.breached]="dept.breachedCount > 0">
+                    {{ dept.breachedCount }}
+                  </span>
+                </td>
+                <td class="compliance-col">
+                  <div class="compliance-row">
+                    <div class="progress-track">
+                      <div
+                        class="progress-bar"
+                        [style.width.%]="dept.complianceRate"
+                        [class.bar-emerald]="dept.complianceRate >= 90"
+                        [class.bar-amber]="dept.complianceRate >= 75 && dept.complianceRate < 90"
+                        [class.bar-rose]="dept.complianceRate < 75"
+                      ></div>
+                    </div>
+                    <span class="compliance-txt">{{ dept.complianceRate | number:'1.1-1' }}%</span>
+                  </div>
+                </td>
+                <td class="time-col">{{ dept.avgResolutionHours | number:'1.1-1' }}h</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Agent Productivity Leaderboard -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon-badge kpi-purple">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M14 17a4 4 0 0 0-8 0"/>
+            <circle cx="10" cy="7" r="3"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="section-title">Agent SLA Productivity Leaderboard</h3>
+          <p class="section-subtitle">Resolution rate and compliance score per service desk agent</p>
+        </div>
+      </div>
+
+      @if (reportData.agents.length === 0) {
+        <div class="empty-hint">
+          No assigned ticket activities recorded during this reporting window.
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>AGENT NAME</th>
+                <th>ASSIGNED</th>
+                <th>RESOLVED</th>
+                <th>BREACHED</th>
+                <th>COMPLIANCE SCORE</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (agent of reportData.agents; track agent.agentEmail) {
+                <tr>
+                  <td class="agent-col">
+                    <span class="agent-name">{{ agent.agentName }}</span>
+                    <span class="agent-email">{{ agent.agentEmail }}</span>
+                  </td>
+                  <td>{{ agent.assignedCount }}</td>
+                  <td><span class="count-badge resolved">{{ agent.resolvedCount }}</span></td>
+                  <td>
+                    <span class="count-badge" [class.breached]="agent.breachedCount > 0">
+                      {{ agent.breachedCount }}
+                    </span>
+                  </td>
+                  <td class="compliance-col">
+                    <div class="compliance-row">
+                      <div class="progress-track">
+                        <div
+                          class="progress-bar"
+                          [style.width.%]="agent.complianceRate"
+                          [class.bar-emerald]="agent.complianceRate >= 90"
+                          [class.bar-amber]="agent.complianceRate >= 75 && agent.complianceRate < 90"
+                          [class.bar-rose]="agent.complianceRate < 75"
+                        ></div>
+                      </div>
+                      <span class="compliance-txt">{{ agent.complianceRate | number:'1.1-1' }}%</span>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>
