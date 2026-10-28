@@ -41,7 +41,7 @@
       </div>
 
       <!-- New Ticket Button -->
-      <button type="button" class="btn btn-primary" (click)="showCreateModal = true">
+      <button type="button" class="btn btn-primary btn-create-glow" (click)="showCreateModal = true">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
           <line x1="10" y1="4" x2="10" y2="16"/>
           <line x1="4" y1="10" x2="16" y2="10"/>
@@ -54,7 +54,7 @@
   <!-- KPI Metric Cards -->
   <div class="stats-grid">
     <!-- Card 1: Total Tickets -->
-    <div class="stat-card">
+    <div class="stat-card" style="--card-accent: #3478F6;">
       <div class="stat-header">
         <span class="stat-label">Total Tickets</span>
         <div class="stat-icon-wrapper stat-icon-primary">
@@ -68,7 +68,7 @@
     </div>
 
     <!-- Card 2: Open / Assigned -->
-    <div class="stat-card">
+    <div class="stat-card" style="--card-accent: #8955F6;">
       <div class="stat-header">
         <span class="stat-label">Open / Queued</span>
         <div class="stat-icon-wrapper stat-icon-info">
@@ -83,7 +83,7 @@
     </div>
 
     <!-- Card 3: In Progress -->
-    <div class="stat-card">
+    <div class="stat-card" style="--card-accent: #20D6B0;">
       <div class="stat-header">
         <span class="stat-label">In Progress</span>
         <div class="stat-icon-wrapper stat-icon-warning">
@@ -97,7 +97,7 @@
     </div>
 
     <!-- Card 4: High / Critical -->
-    <div class="stat-card">
+    <div class="stat-card" style="--card-accent: #FF5268;">
       <div class="stat-header">
         <span class="stat-label">High / Critical</span>
         <div class="stat-icon-wrapper stat-icon-danger">

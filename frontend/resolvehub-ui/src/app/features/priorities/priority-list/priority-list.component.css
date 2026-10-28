@@ -1,15 +1,22 @@
 /* ==========================================================================
-   ResolveHub - Priority Guidelines Component Styles
+   ResolveHub - Priority Guidelines & SLA Matrix Component Styles
+   Midnight-Navy Glassmorphic Grid & ITIL Matrix
    ========================================================================== */
 
 .priorities-page {
-  padding: 1.75rem 2rem;
+  padding: 1.75rem 2rem 3rem;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
   width: 100%;
+  animation: prioFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes prioFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Page Header */
@@ -22,7 +29,7 @@
 }
 
 .page-title {
-  font-size: 1.5rem;
+  font-size: 1.625rem;
   font-weight: 800;
   color: var(--text-primary, #F4F7FF);
   margin: 0;
@@ -35,90 +42,106 @@
   margin: 0.25rem 0 0;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5625rem 1.125rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: none;
+.btn-create-glow {
+  background: linear-gradient(135deg, #3478F6 0%, #6366F1 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(52, 120, 246, 0.35) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #3478F6 0%, #8955F6 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(52, 120, 246, 0.35);
+.btn-create-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 120, 246, 0.5) !important;
 }
 
-.btn-primary:hover {
-  background: linear-gradient(135deg, #2b63cb 0%, #7544d8 100%);
-  transform: translateY(-1px);
-}
-
-/* Priority Grid */
+/* ==========================================================================
+   Priority Cards Grid (Balanced 4 Priorities)
+   ========================================================================== */
 .priority-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.25rem;
 }
 
+@media (max-width: 1280px) {
+  .priority-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .priority-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .priority-card {
-  background: var(--bg-surface, #0D1D36);
-  border: 1px solid var(--border-color, #1D3557);
+  background: linear-gradient(145deg, rgba(14, 30, 58, 0.85) 0%, rgba(9, 21, 41, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  transition: transform 0.15s, border-color 0.15s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(12px);
 }
 
 .priority-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(52, 120, 246, 0.5);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Color Themes per Priority */
+/* Semantic Priority Themes */
 .badge-urgent {
-  border-top: 4px solid var(--accent-danger, #FF5268);
+  border-top: 3px solid #FF5268;
+}
+.badge-urgent:hover {
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 82, 104, 0.2);
 }
 .badge-urgent .p-badge {
   background: rgba(255, 82, 104, 0.15);
-  color: #ff7e8e;
-  border: 1px solid rgba(255, 82, 104, 0.3);
+  color: #FF5268;
+  border: 1px solid rgba(255, 82, 104, 0.35);
 }
 
 .badge-high {
-  border-top: 4px solid var(--accent-warning, #F5B942);
+  border-top: 3px solid #F5B942;
+}
+.badge-high:hover {
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 185, 66, 0.2);
 }
 .badge-high .p-badge {
   background: rgba(245, 185, 66, 0.15);
-  color: #f7ca6d;
-  border: 1px solid rgba(245, 185, 66, 0.3);
+  color: #F5B942;
+  border: 1px solid rgba(245, 185, 66, 0.35);
 }
 
 .badge-medium {
-  border-top: 4px solid var(--accent-blue, #3478F6);
+  border-top: 3px solid #3478F6;
+}
+.badge-medium:hover {
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(52, 120, 246, 0.2);
 }
 .badge-medium .p-badge {
   background: rgba(52, 120, 246, 0.15);
-  color: #72a3fe;
-  border: 1px solid rgba(52, 120, 246, 0.3);
+  color: #60A5FA;
+  border: 1px solid rgba(52, 120, 246, 0.35);
 }
 
 .badge-low {
-  border-top: 4px solid var(--accent-success, #24D6A0);
+  border-top: 3px solid #24D6A0;
+}
+.badge-low:hover {
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(36, 214, 160, 0.2);
 }
 .badge-low .p-badge {
   background: rgba(36, 214, 160, 0.15);
-  color: #5ce3bc;
-  border: 1px solid rgba(36, 214, 160, 0.3);
+  color: #24D6A0;
+  border: 1px solid rgba(36, 214, 160, 0.35);
 }
 
 /* Card Header */
@@ -139,22 +162,23 @@
   font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.05em;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
 }
 
 .p-name {
   font-size: 1.0625rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary, #F4F7FF);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .active-count-badge {
   display: flex;
   align-items: baseline;
   gap: 0.25rem;
-  background: var(--bg-elevated, #112442);
+  background: rgba(17, 36, 66, 0.8);
   border: 1px solid var(--border-color, #1D3557);
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
@@ -181,8 +205,8 @@
 
 /* Targets Box */
 .targets-box {
-  background: var(--bg-elevated, #112442);
-  border: 1px solid var(--border-color, #1D3557);
+  background: rgba(17, 36, 66, 0.6);
+  border: 1px solid rgba(29, 53, 87, 0.7);
   border-radius: 10px;
   padding: 0.875rem 1rem;
   display: flex;
@@ -206,8 +230,9 @@
 
 .target-val {
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary, #F4F7FF);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .target-divider {
@@ -221,9 +246,9 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+  border-radius: 8px;
   background: rgba(245, 185, 66, 0.12);
-  color: var(--accent-warning, #F5B942);
+  color: var(--warning, #F5B942);
   border: 1px solid rgba(245, 185, 66, 0.25);
   font-size: 0.75rem;
   font-weight: 500;
@@ -245,7 +270,7 @@
 .criteria-heading {
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted, #7487A4);
   display: block;
   margin-bottom: 0.625rem;
@@ -272,23 +297,23 @@
 .check-icon {
   width: 14px;
   height: 14px;
-  color: var(--accent-blue, #3478F6);
+  color: var(--primary, #3478F6);
   margin-top: 2px;
   flex-shrink: 0;
 }
 
 /* Card Footer */
 .card-footer {
-  border-top: 1px solid var(--border-color, #1D3557);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 1rem;
 }
 
 .view-tickets-btn {
   width: 100%;
-  background: rgba(52, 120, 246, 0.08);
-  border: 1px solid var(--border-color, #1D3557);
+  background: rgba(52, 120, 246, 0.1);
+  border: 1px solid rgba(52, 120, 246, 0.25);
   border-radius: 8px;
-  padding: 0.5625rem 1rem;
+  padding: 0.625rem 1rem;
   color: var(--text-primary, #F4F7FF);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -297,27 +322,36 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: all 0.15s;
-}
-
-.view-tickets-btn:hover {
-  background: rgba(52, 120, 246, 0.18);
-  border-color: var(--accent-blue, #3478F6);
-  color: #ffffff;
+  transition: all var(--transition-fast);
 }
 
 .view-tickets-btn svg {
   width: 15px;
   height: 15px;
+  transition: transform 0.2s ease;
 }
 
-/* Matrix Card */
+.view-tickets-btn:hover {
+  background: rgba(52, 120, 246, 0.22);
+  border-color: var(--primary, #3478F6);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(52, 120, 246, 0.25);
+}
+
+.view-tickets-btn:hover svg {
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Impact vs Urgency Calculation Matrix
+   ========================================================================== */
 .matrix-card {
-  background: var(--bg-surface, #0D1D36);
-  border: 1px solid var(--border-color, #1D3557);
+  background: linear-gradient(180deg, rgba(13, 29, 54, 0.85) 0%, rgba(9, 21, 41, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
 }
 
 .matrix-header {
@@ -333,7 +367,7 @@
   border-radius: 12px;
   background: rgba(52, 120, 246, 0.15);
   border: 1px solid rgba(52, 120, 246, 0.3);
-  color: var(--accent-blue, #3478F6);
+  color: var(--primary, #3478F6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,13 +403,13 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--text-secondary, #A9B9D2);
-  border-bottom: 1px solid var(--border-color, #1D3557);
-  background: var(--bg-elevated, #112442);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-surface-elevated, #112442);
 }
 
 .matrix-table td {
   padding: 1rem;
-  border-bottom: 1px solid rgba(29, 53, 87, 0.6);
+  border-bottom: 1px solid rgba(29, 53, 87, 0.45);
 }
 
 .impact-col {
