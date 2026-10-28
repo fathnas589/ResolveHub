@@ -2,9 +2,15 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-left">
-      <span class="page-badge">Help Center</span>
+      <div class="header-badge-row">
+        <span class="page-badge">
+          <span class="badge-beacon"></span>
+          Help Center &bull; Requester Portal
+        </span>
+        <span class="count-pill">{{ totalCount }} Total</span>
+      </div>
       <h1 class="page-title">My Requests</h1>
-      <p class="page-subtitle">View and monitor the status of all requests you have submitted.</p>
+      <p class="page-subtitle">Track and monitor real-time resolution progress of all tickets you've submitted.</p>
     </div>
     <div class="header-actions">
       <a routerLink="/user/raise-ticket" class="btn btn-primary" id="btn-raise-new-ticket">
@@ -34,27 +40,45 @@
     </div>
 
     <div class="toolbar-filters">
-      <select class="filter-select" [(ngModel)]="filters.status" (change)="onFilterChange()">
-        @for (opt of statusOptions; track opt.value) {
-          <option [value]="opt.value">{{ opt.label }}</option>
-        }
-      </select>
+      <div class="select-wrapper">
+        <select class="filter-select" [(ngModel)]="filters.status" (change)="onFilterChange()">
+          @for (opt of statusOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+        <svg class="select-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6l4 4 4-4"/>
+        </svg>
+      </div>
 
-      <select class="filter-select" [(ngModel)]="filters.priority" (change)="onFilterChange()">
-        @for (opt of priorityOptions; track opt.value) {
-          <option [value]="opt.value">{{ opt.label }}</option>
-        }
-      </select>
+      <div class="select-wrapper">
+        <select class="filter-select" [(ngModel)]="filters.priority" (change)="onFilterChange()">
+          @for (opt of priorityOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+        <svg class="select-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6l4 4 4-4"/>
+        </svg>
+      </div>
 
-      <select class="filter-select" [(ngModel)]="filters.ticketType" (change)="onFilterChange()">
-        @for (opt of typeOptions; track opt.value) {
-          <option [value]="opt.value">{{ opt.label }}</option>
-        }
-      </select>
+      <div class="select-wrapper">
+        <select class="filter-select" [(ngModel)]="filters.ticketType" (change)="onFilterChange()">
+          @for (opt of typeOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+        <svg class="select-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6l4 4 4-4"/>
+        </svg>
+      </div>
 
       @if (filters.searchTerm || filters.status || filters.priority || filters.ticketType) {
         <button class="btn btn-sm btn-outline btn-reset" (click)="resetFilters()" title="Reset Filters">
-          Reset
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 4L4 12M4 4l8 8"/>
+          </svg>
+          <span>Reset</span>
         </button>
       }
     </div>
@@ -78,11 +102,15 @@
       </div>
     } @else if (tickets.length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📂</div>
+        <div class="empty-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12h6M9 16h4M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/>
+          </svg>
+        </div>
         <h3>No Requests Found</h3>
         <p>
           @if (filters.searchTerm || filters.status || filters.priority || filters.ticketType) {
-            No requests matched your filter criteria. Try clearing filters.
+            No requests matched your filter criteria. Try clearing search filters.
           } @else {
             You have not submitted any tickets yet. Need assistance? Submit a request today.
           }
@@ -111,8 +139,8 @@
           <tbody>
             @for (t of tickets; track t.gId) {
               <tr class="data-row" (click)="openTicketDetails(t.gId)">
-                <td class="font-mono text-primary font-semibold">
-                  {{ t.ticketNumber }}
+                <td class="font-mono ticket-col">
+                  <span class="ticket-tag">{{ t.ticketNumber }}</span>
                 </td>
                 <td class="subject-cell">
                   <span class="subject-title" [title]="t.subject">{{ t.subject }}</span>
@@ -126,6 +154,7 @@
                 </td>
                 <td>
                   <span class="status-badge" [ngClass]="getStatusBadgeClass(t.status)">
+                    <span class="status-dot"></span>
                     {{ t.status }}
                   </span>
                 </td>
@@ -138,8 +167,11 @@
                   {{ (t.lastUpd || t.created) | date:'mediumDate' }}
                 </td>
                 <td class="text-right" (click)="$event.stopPropagation()">
-                  <button class="btn btn-sm btn-ghost" (click)="openTicketDetails(t.gId)">
-                    View &rarr;
+                  <button class="action-btn" (click)="openTicketDetails(t.gId)" title="View Ticket Details">
+                    <span>View</span>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M6 3l5 5-5 5"/>
+                    </svg>
                   </button>
                 </td>
               </tr>
@@ -151,9 +183,9 @@
       <!-- Pagination Footer -->
       <div class="pagination-footer">
         <div class="pagination-info">
-          Showing {{ (filters.pageNumber - 1) * filters.pageSize + 1 }} -
-          {{ (filters.pageNumber * filters.pageSize) > totalCount ? totalCount : (filters.pageNumber * filters.pageSize) }}
-          of {{ totalCount }} requests
+          Showing <strong>{{ (filters.pageNumber - 1) * filters.pageSize + 1 }}</strong> -
+          <strong>{{ (filters.pageNumber * filters.pageSize) > totalCount ? totalCount : (filters.pageNumber * filters.pageSize) }}</strong>
+          of <strong>{{ totalCount }}</strong> requests
         </div>
 
         @if (totalPages > 1) {
@@ -163,7 +195,10 @@
               [disabled]="filters.pageNumber <= 1"
               (click)="goToPage(filters.pageNumber - 1)"
             >
-              &larr; Prev
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13l-5-5 5-5"/>
+              </svg>
+              <span>Prev</span>
             </button>
             <span class="page-indicator">Page {{ filters.pageNumber }} of {{ totalPages }}</span>
             <button
@@ -171,7 +206,10 @@
               [disabled]="filters.pageNumber >= totalPages"
               (click)="goToPage(filters.pageNumber + 1)"
             >
-              Next &rarr;
+              <span>Next</span>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 3l5 5-5 5"/>
+              </svg>
             </button>
           </div>
         }

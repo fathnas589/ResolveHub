@@ -2,9 +2,17 @@
   <!-- Page Header -->
   <div class="dashboard-header">
     <div class="header-left">
-      <span class="portal-badge">Employee Service Portal</span>
-      <h1 class="welcome-heading">Welcome back, {{ authService.currentUser()?.fullName || 'Requester' }}!</h1>
-      <p class="welcome-subtext">Track your service requests, submit new issues, and check real-time resolution progress.</p>
+      <div class="badge-row">
+        <span class="portal-badge">
+          <span class="portal-beacon"></span>
+          Employee Service Portal
+        </span>
+        <span class="tenant-badge">Tenant #{{ authService.currentUser()?.companyId || 1 }}</span>
+      </div>
+      <h1 class="welcome-heading">
+        Welcome back, <span class="user-name-highlight">{{ authService.currentUser()?.fullName || 'Requester' }}</span>!
+      </h1>
+      <p class="welcome-subtext">Track active support requests, submit new issues, and monitor SLA resolution in real time.</p>
     </div>
     <div class="header-actions">
       <a routerLink="/user/raise-ticket" class="btn btn-primary" id="btn-raise-ticket">
@@ -42,58 +50,90 @@
   } @else {
     <!-- Personal KPI Cards Grid -->
     <div class="kpi-grid">
+      <!-- Total Requests -->
       <div class="kpi-card total-card">
-        <div class="kpi-icon-box total-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
-          </svg>
+        <div class="kpi-top-row">
+          <div class="kpi-icon-box total-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-total">All-Time</span>
         </div>
         <div class="kpi-content">
           <span class="kpi-label">My Total Requests</span>
-          <span class="kpi-value">{{ kpis.total }}</span>
+          <div class="kpi-number-row">
+            <span class="kpi-value">{{ kpis.total }}</span>
+            <span class="kpi-unit">tickets</span>
+          </div>
         </div>
+        <div class="kpi-wave-bar wave-violet"></div>
       </div>
 
+      <!-- Open / Pending Review -->
       <div class="kpi-card open-card">
-        <div class="kpi-icon-box open-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 14 14"/>
-          </svg>
+        <div class="kpi-top-row">
+          <div class="kpi-icon-box open-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 14 14"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-open">Awaiting Review</span>
         </div>
         <div class="kpi-content">
           <span class="kpi-label">Open / Pending Review</span>
-          <span class="kpi-value">{{ kpis.open }}</span>
+          <div class="kpi-number-row">
+            <span class="kpi-value">{{ kpis.open }}</span>
+            <span class="kpi-unit">pending</span>
+          </div>
         </div>
+        <div class="kpi-wave-bar wave-amber"></div>
       </div>
 
+      <!-- In Progress / Assigned -->
       <div class="kpi-card progress-card">
-        <div class="kpi-icon-box progress-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
+        <div class="kpi-top-row">
+          <div class="kpi-icon-box progress-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-progress">Active Work</span>
         </div>
         <div class="kpi-content">
           <span class="kpi-label">In Progress / Assigned</span>
-          <span class="kpi-value">{{ kpis.inProgress }}</span>
+          <div class="kpi-number-row">
+            <span class="kpi-value">{{ kpis.inProgress }}</span>
+            <span class="kpi-unit">active</span>
+          </div>
         </div>
+        <div class="kpi-wave-bar wave-blue"></div>
       </div>
 
+      <!-- Resolved / Closed -->
       <div class="kpi-card resolved-card">
-        <div class="kpi-icon-box resolved-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
+        <div class="kpi-top-row">
+          <div class="kpi-icon-box resolved-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-resolved">Completed</span>
         </div>
         <div class="kpi-content">
           <span class="kpi-label">Resolved / Closed</span>
-          <span class="kpi-value">{{ kpis.resolvedClosed }}</span>
+          <div class="kpi-number-row">
+            <span class="kpi-value">{{ kpis.resolvedClosed }}</span>
+            <span class="kpi-unit">closed</span>
+          </div>
         </div>
+        <div class="kpi-wave-bar wave-emerald"></div>
       </div>
     </div>
 
@@ -101,20 +141,33 @@
     <div class="recent-requests-section">
       <div class="section-header">
         <div class="section-title-group">
-          <h2 class="section-title">My Recent Requests</h2>
-          <span class="section-subtitle">Showing your 5 most recently created or updated tickets</span>
+          <div class="section-icon-box">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 4h12v12H4zM4 8h12M8 4v12"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="section-title">My Recent Requests</h2>
+            <span class="section-subtitle">Real-time resolution updates on your 5 latest tickets</span>
+          </div>
         </div>
         <a routerLink="/user/tickets" class="view-all-link">
           <span>View All ({{ kpis.total }})</span>
-          <span class="arrow">&rarr;</span>
+          <svg class="arrow-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 3l5 5-5 5"/>
+          </svg>
         </a>
       </div>
 
       @if (recentTickets.length === 0) {
         <div class="empty-state-card">
-          <div class="empty-icon">📂</div>
+          <div class="empty-icon-glow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 12h6M9 16h4M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/>
+            </svg>
+          </div>
           <h3>No Requests Yet</h3>
-          <p>You haven't submitted any complaints or service requests yet. If you are experiencing an issue or need assistance, submit your request below.</p>
+          <p>You haven't submitted any complaints or service requests yet. When you raise an issue, live progress and engineer assignments will appear here.</p>
           <a routerLink="/user/raise-ticket" class="btn btn-primary btn-sm">
             <span>Submit Your First Request</span>
           </a>
@@ -136,18 +189,21 @@
             <tbody>
               @for (ticket of recentTickets; track ticket.gId) {
                 <tr class="ticket-row" (click)="viewTicketDetails(ticket.gId)">
-                  <td class="font-mono font-semibold text-primary">
-                    {{ ticket.ticketNumber }}
+                  <td class="font-mono ticket-id-cell">
+                    <span class="ticket-id-tag">{{ ticket.ticketNumber }}</span>
                   </td>
                   <td class="subject-cell">
                     <span class="subject-text" [title]="ticket.subject">{{ ticket.subject }}</span>
-                    <span class="type-badge">{{ ticket.ticketType }}</span>
+                    <span class="type-pill" [attr.data-type]="ticket.ticketType">{{ ticket.ticketType }}</span>
                   </td>
-                  <td class="text-muted">
-                    {{ ticket.categoryName || ticket.departmentName }}
+                  <td class="cat-cell">
+                    <div class="cat-wrapper">
+                      <span class="cat-main">{{ ticket.categoryName || ticket.departmentName }}</span>
+                    </div>
                   </td>
                   <td>
                     <span class="status-badge" [ngClass]="getStatusBadgeClass(ticket.status)">
+                      <span class="status-dot"></span>
                       {{ ticket.status }}
                     </span>
                   </td>
@@ -156,12 +212,15 @@
                       {{ ticket.priority }}
                     </span>
                   </td>
-                  <td class="text-muted text-sm">
+                  <td class="text-muted text-sm date-col">
                     {{ ticket.created | date:'mediumDate' }}
                   </td>
-                  <td class="text-right" (click)="$event.stopPropagation()">
-                    <button class="btn btn-sm btn-ghost" (click)="viewTicketDetails(ticket.gId)" title="View Details">
-                      View &rarr;
+                  <td class="text-right action-col" (click)="$event.stopPropagation()">
+                    <button class="action-btn" (click)="viewTicketDetails(ticket.gId)" title="View Details">
+                      <span>View</span>
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 3l5 5-5 5"/>
+                      </svg>
                     </button>
                   </td>
                 </tr>
