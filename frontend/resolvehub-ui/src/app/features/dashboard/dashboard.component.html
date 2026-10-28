@@ -2,17 +2,24 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-left-col">
-      <h1 class="page-title">Operations & SLA Dashboard</h1>
+      <div class="header-title-row">
+        <h1 class="page-title">Operations & SLA Dashboard</h1>
+        <div class="live-status-pill" title="Real-time WebSocket/Polling Stream Active">
+          <span class="pulse-ring"></span>
+          <span class="pulse-dot"></span>
+          <span>LIVE OPS</span>
+        </div>
+      </div>
       <p class="page-subtitle">Real-time service desk metrics, SLA compliance health, and live workload pipeline</p>
     </div>
     <div class="header-actions">
-      <button type="button" class="btn btn-secondary" (click)="loadMetrics()">
+      <button type="button" class="btn btn-secondary btn-refresh" (click)="loadMetrics()" title="Refresh live telemetry">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
         </svg>
         <span>Refresh</span>
       </button>
-      <button type="button" class="btn btn-primary" (click)="createTicket()">
+      <button type="button" class="btn btn-primary btn-create-glow" (click)="createTicket()">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M10 5v10M5 10h10"/>
         </svg>
@@ -30,15 +37,18 @@
     <!-- KPI Metric Cards Grid -->
     <div class="kpi-grid">
       <!-- Open Tickets -->
-      <div class="kpi-card" (click)="viewAllTickets()">
-        <div class="kpi-icon-box kpi-blue">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
-          </svg>
+      <div class="kpi-card card-open" (click)="viewAllTickets()" style="--card-accent: #3478F6;">
+        <div class="kpi-top">
+          <div class="kpi-icon-box kpi-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-blue">Active</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label">OPEN TICKETS</span>
@@ -47,12 +57,15 @@
       </div>
 
       <!-- In Progress -->
-      <div class="kpi-card" (click)="viewAllTickets()">
-        <div class="kpi-icon-box kpi-purple">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
+      <div class="kpi-card card-progress" (click)="viewAllTickets()" style="--card-accent: #8955F6;">
+        <div class="kpi-top">
+          <div class="kpi-icon-box kpi-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-purple">In Flight</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label">IN PROGRESS</span>
@@ -61,12 +74,15 @@
       </div>
 
       <!-- Resolved Today -->
-      <div class="kpi-card">
-        <div class="kpi-icon-box kpi-emerald">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
+      <div class="kpi-card card-resolved" style="--card-accent: #24D6A0;">
+        <div class="kpi-top">
+          <div class="kpi-icon-box kpi-emerald">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-emerald">Resolved</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label">RESOLVED TODAY</span>
@@ -75,13 +91,16 @@
       </div>
 
       <!-- SLA Breaches -->
-      <div class="kpi-card" [class.alert-glow]="metrics.summary.breachedTickets > 0" (click)="viewBreachedTickets()">
-        <div class="kpi-icon-box kpi-rose">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
+      <div class="kpi-card card-breach" [class.alert-glow]="metrics.summary.breachedTickets > 0" (click)="viewBreachedTickets()" style="--card-accent: #FF5268;">
+        <div class="kpi-top">
+          <div class="kpi-icon-box kpi-rose">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-rose">Action Req</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label">SLA BREACHES</span>
@@ -90,13 +109,16 @@
       </div>
 
       <!-- SLA Warnings -->
-      <div class="kpi-card">
-        <div class="kpi-icon-box kpi-amber">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
+      <div class="kpi-card card-warning" style="--card-accent: #F5B942;">
+        <div class="kpi-top">
+          <div class="kpi-icon-box kpi-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-amber">{{ metrics.summary.warningTickets > 0 ? 'Warning' : 'Protected' }}</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label">SLA AT RISK</span>
@@ -105,16 +127,19 @@
       </div>
 
       <!-- Avg Response Time -->
-      <div class="kpi-card">
-        <div class="kpi-icon-box kpi-indigo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-            <polyline points="17 6 23 6 23 12"/>
-          </svg>
+      <div class="kpi-card card-response" style="--card-accent: #20D6B0;">
+        <div class="kpi-top">
+          <div class="kpi-icon-box kpi-indigo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+          <span class="kpi-tag tag-indigo">Speed</span>
         </div>
         <div class="kpi-info">
           <span class="kpi-label">AVG RESPONSE TIME</span>
-          <span class="kpi-value">{{ metrics.summary.avgResponseHours | number:'1.1-1' }}h</span>
+          <span class="kpi-value text-teal">{{ metrics.summary.avgResponseHours | number:'1.1-1' }}h</span>
         </div>
       </div>
     </div>
@@ -124,8 +149,17 @@
       <!-- Priority Distribution -->
       <div class="chart-card">
         <div class="card-header-clean">
-          <h3 class="card-title">Tickets by Priority</h3>
-          <span class="card-subtitle">{{ metrics.summary.totalTickets }} total requests</span>
+          <div class="card-title-row">
+            <div class="chart-header-icon chart-icon-amber">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 4h14M3 10h10M3 16h6"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Tickets by Priority</h3>
+              <span class="card-subtitle">{{ metrics.summary.totalTickets }} total requests</span>
+            </div>
+          </div>
         </div>
         <div class="distribution-list">
           @for (p of metrics.priorityBreakdown; track p.name) {
@@ -149,8 +183,18 @@
       <!-- Status Pipeline -->
       <div class="chart-card">
         <div class="card-header-clean">
-          <h3 class="card-title">Workflow Status Pipeline</h3>
-          <span class="card-subtitle">Active ticket distribution</span>
+          <div class="card-title-row">
+            <div class="chart-header-icon chart-icon-purple">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="10" cy="10" r="7"/>
+                <polyline points="10 6 10 10 13 12"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Workflow Status Pipeline</h3>
+              <span class="card-subtitle">Active ticket distribution</span>
+            </div>
+          </div>
         </div>
         <div class="distribution-list">
           @for (s of metrics.statusBreakdown; track s.name) {
@@ -174,21 +218,31 @@
       <!-- Department Distribution -->
       <div class="chart-card">
         <div class="card-header-clean">
-          <h3 class="card-title">Department Workload</h3>
-          <span class="card-subtitle">Volume across business units</span>
+          <div class="card-title-row">
+            <div class="chart-header-icon chart-icon-blue">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 17V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12"/>
+                <path d="M9 17v-4a1 1 0 0 1 1-1h0a1 1 0 0 1 1 1v4"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Department Workload</h3>
+              <span class="card-subtitle">Volume across business units</span>
+            </div>
+          </div>
         </div>
-        <div class="distribution-list">
+        <div class="distribution-list distribution-scroll">
           @for (d of metrics.departmentBreakdown; track d.name) {
             <div class="dist-row">
               <div class="dist-labels">
-                <span class="dist-name">{{ d.name }}</span>
+                <span class="dist-name" [title]="d.name">{{ d.name }}</span>
                 <span class="dist-count">{{ d.count }}</span>
               </div>
               <div class="progress-track">
                 <div
                   class="progress-bar"
                   [style.width.%]="metrics.summary.totalTickets > 0 ? (d.count / metrics.summary.totalTickets * 100) : 0"
-                  style="background: #3b82f6;"
+                  style="background: linear-gradient(90deg, #3478F6 0%, #60A5FA 100%);"
                 ></div>
               </div>
             </div>
@@ -200,9 +254,16 @@
     <!-- Recent Tickets Feed -->
     <div class="recent-tickets-card">
       <div class="card-header-clean flex-between">
-        <div>
-          <h3 class="card-title">Recent Tickets & Requests</h3>
-          <span class="card-subtitle">Latest operations queue updates</span>
+        <div class="card-title-row">
+          <div class="chart-header-icon chart-icon-teal">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h12M4 10h12M4 14h8"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="card-title">Recent Tickets & Requests</h3>
+            <span class="card-subtitle">Latest operations queue updates</span>
+          </div>
         </div>
         <button type="button" class="link-btn" (click)="viewAllTickets()">
           View All Tickets &rarr;

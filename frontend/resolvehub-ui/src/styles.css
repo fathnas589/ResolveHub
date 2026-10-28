@@ -218,6 +218,13 @@ input, button, select, textarea {
   line-height: 1.25;
 }
 
+.btn svg,
+.btn-sm svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #3478F6 0%, #2563eb 100%);
   color: #ffffff;

@@ -453,3 +453,165 @@
   gap: 1rem;
   color: var(--text-muted);
 }
+
+/* Dedicated SLA Tracking & Health Card */
+.sla-overview-card {
+  background: linear-gradient(145deg, rgba(14, 30, 58, 0.85) 0%, rgba(9, 21, 41, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.sla-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.sla-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sla-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(52, 120, 246, 0.15);
+  border: 1px solid rgba(52, 120, 246, 0.3);
+  color: var(--primary, #3478F6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sla-icon-wrapper svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sla-policy-heading {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.sla-policy-heading strong {
+  color: var(--text-primary);
+}
+
+.sla-health-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+}
+
+.sla-health-badge[data-sla="COMPLIANT"] {
+  background: rgba(36, 214, 160, 0.15);
+  color: #24D6A0;
+  border: 1px solid rgba(36, 214, 160, 0.3);
+}
+
+.sla-health-badge[data-sla="BREACHED"] {
+  background: rgba(255, 82, 104, 0.15);
+  color: #FF5268;
+  border: 1px solid rgba(255, 82, 104, 0.3);
+}
+
+.sla-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sla-warning-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--warning, #F5B942);
+}
+
+.sla-warning-note svg {
+  width: 14px;
+  height: 14px;
+}
+
+.sla-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.sla-metric-box {
+  background: rgba(17, 36, 66, 0.6);
+  border: 1px solid rgba(29, 53, 87, 0.6);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sla-box-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.sla-metric-title {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.sla-target-time {
+  color: var(--text-secondary);
+}
+
+.sla-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tag-met { color: #24D6A0; }
+.tag-breached { color: #FF5268; }
+.tag-pending { color: #F5B942; }
+
+/* Empty Comments / History State */
+.empty-comments {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.empty-comments svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+  color: var(--primary, #3478F6);
+}
+
+.empty-comments p {
+  margin: 0;
+  font-size: 0.875rem;
+}
