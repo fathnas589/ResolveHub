@@ -1,70 +1,232 @@
 <div class="user-profile-page">
+  <!-- Top Navigation & Breadcrumb -->
   <div class="page-top-nav">
-    <a routerLink="/user/dashboard" class="back-link">
+    <a routerLink="/user/dashboard" class="back-link" id="link-back-dashboard">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M15 10H5M10 15l-5-5 5-5"/>
+        <path d="M15 10H5M10 15l-5-5 5-5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span>Back to Dashboard</span>
     </a>
+    <div class="breadcrumb-badge">
+      <span class="pulse-beacon"></span>
+      <span>Profile & Credentials</span>
+    </div>
   </div>
 
   <div class="profile-card">
-    <div class="profile-header">
-      <div class="avatar-large">{{ userInitials }}</div>
-      <div class="header-details">
-        <div class="badge-role">Requester &bull; Employee Account</div>
+    <!-- Hero Profile Header -->
+    <div class="profile-hero">
+      <div class="avatar-wrapper">
+        <div class="avatar-large">{{ userInitials }}</div>
+        <div class="avatar-status-dot" title="Active Account"></div>
+      </div>
+
+      <div class="hero-details">
+        <div class="role-badge-row">
+          <span class="badge-role">
+            <svg class="role-icon" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0c-.69 0-1.37.08-2 .24A7.99 7.99 0 0 0 0 8a8 8 0 1 0 8-8zm0 14.5A6.5 6.5 0 1 1 8 1.5a6.5 6.5 0 0 1 0 13z"/>
+              <circle cx="8" cy="8" r="3"/>
+            </svg>
+            Requester &bull; Employee Account
+          </span>
+          <span class="verified-chip">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3.5 8.5l3 3 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Active Session
+          </span>
+        </div>
+
         <h1 class="user-fullname">{{ user?.fullName || 'ResolveHub Employee' }}</h1>
-        <p class="user-email-subtitle">{{ user?.email || user?.userName }}</p>
+
+        <div class="user-identity-subtext">
+          <span class="user-handle">&#64;{{ user?.userName || 'requester' }}</span>
+          @if (user?.email) {
+            <span class="meta-dot">&bull;</span>
+            <span class="user-email-item">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="3" width="12" height="10" rx="2"/>
+                <path d="M2 5l6 4 6-4"/>
+              </svg>
+              <span>{{ user?.email }}</span>
+            </span>
+          } @else {
+            <span class="meta-dot">&bull;</span>
+            <span class="sso-label">Enterprise SSO Account</span>
+          }
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-pill">
+          <span class="stat-label">Tenant ID</span>
+          <span class="stat-value">#{{ user?.companyId || 1 }}</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Access Level</span>
+          <span class="stat-value text-accent">{{ user?.role || 'USER' }}</span>
+        </div>
       </div>
     </div>
 
     <div class="divider"></div>
 
+    <!-- Identity & Account Details Grid -->
     <div class="profile-sections">
-      <h2 class="section-title">Identity & Account Details</h2>
+      <div class="section-title-bar">
+        <div class="title-with-icon">
+          <div class="title-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="4" width="14" height="12" rx="2"/>
+              <circle cx="10" cy="9" r="2.5"/>
+              <path d="M6 14c0-1.5 1.8-2 4-2s4 .5 4 2"/>
+            </svg>
+          </div>
+          <h2 class="section-title">Identity & Account Details</h2>
+        </div>
+        <span class="section-subtitle">Synced via Enterprise Directory</span>
+      </div>
 
       <div class="details-grid">
+        <!-- 1. Full Name -->
         <div class="detail-box">
-          <span class="detail-label">Full Name</span>
-          <span class="detail-value">{{ user?.fullName || 'Not provided' }}</span>
+          <div class="box-icon icon-blue">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM4 17a6 6 0 0 1 12 0"/>
+            </svg>
+          </div>
+          <div class="box-content">
+            <span class="detail-label">Full Name</span>
+            <span class="detail-value">{{ user?.fullName || 'Not provided' }}</span>
+          </div>
         </div>
 
+        <!-- 2. Username -->
         <div class="detail-box">
-          <span class="detail-label">Username</span>
-          <span class="detail-value font-mono">{{ user?.userName }}</span>
+          <div class="box-icon icon-violet">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="10" cy="10" r="7"/>
+              <path d="M13 8v3a2 2 0 1 1-4 0v-2a1 1 0 1 1 2 0v2"/>
+            </svg>
+          </div>
+          <div class="box-content">
+            <span class="detail-label">Username</span>
+            <span class="detail-value font-mono highlight-user">{{ user?.userName }}</span>
+          </div>
         </div>
 
+        <!-- 3. Email Address -->
         <div class="detail-box">
-          <span class="detail-label">Email Address</span>
-          <span class="detail-value font-mono">{{ user?.email || 'N/A' }}</span>
+          <div class="box-icon icon-teal">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="2.5" y="4.5" width="15" height="11" rx="2"/>
+              <path d="M3 6l7 5 7-5"/>
+            </svg>
+          </div>
+          <div class="box-content">
+            <span class="detail-label">Email Address</span>
+            <span class="detail-value font-mono">{{ user?.email || 'N/A' }}</span>
+          </div>
         </div>
 
+        <!-- 4. Assigned Role -->
         <div class="detail-box">
-          <span class="detail-label">Assigned Role</span>
-          <span class="detail-value role-badge">{{ user?.role || 'USER' }}</span>
+          <div class="box-icon icon-indigo">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M10 2l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V5l7-3z"/>
+              <path d="M7.5 10l2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="box-content">
+            <span class="detail-label">Assigned Role</span>
+            <span class="detail-value role-badge">{{ user?.role || 'USER' }}</span>
+          </div>
         </div>
 
+        <!-- 5. Organization -->
         <div class="detail-box">
-          <span class="detail-label">Organization / Company ID</span>
-          <span class="detail-value">Company #{{ user?.companyId || 1 }}</span>
+          <div class="box-icon icon-amber">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 18V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v14M12 9h4a1 1 0 0 1 1 1v8M4 18h14M8 7h.01M8 11h.01M8 15h.01M14 13h.01M14 16h.01"/>
+            </svg>
+          </div>
+          <div class="box-content">
+            <span class="detail-label">Organization / Company</span>
+            <span class="detail-value">Company #{{ user?.companyId || 1 }}</span>
+          </div>
         </div>
 
+        <!-- 6. Home Department -->
         <div class="detail-box">
-          <span class="detail-label">Home Department</span>
-          <span class="detail-value">{{ user?.departmentName || 'General / Unassigned' }}</span>
+          <div class="box-icon icon-emerald">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="10" cy="10" r="7"/>
+              <polygon points="12 8 10.5 11.5 8 12 9.5 8.5 12 8"/>
+            </svg>
+          </div>
+          <div class="box-content">
+            <span class="detail-label">Home Department</span>
+            <span class="detail-value">{{ user?.departmentName || 'General / Unassigned' }}</span>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="divider"></div>
 
-    <!-- Security & Scope Notice -->
+    <!-- Security & Scope Notice (Streamlined & High-Tech) -->
     <div class="scope-notice">
-      <div class="notice-icon">🛡️</div>
-      <div class="notice-content">
-        <strong>Self-Service Scope Active</strong>
-        <p>Your account is configured with standard employee requester permissions. You can raise requests, monitor ticket resolution, and add public replies to your active tickets. Administrative operations and user management are handled by company IT administrators.</p>
+      <div class="notice-icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
       </div>
+      <div class="notice-content">
+        <div class="notice-header">
+          <strong>Self-Service Scope Active</strong>
+          <span class="badge-verified">Verified Policy</span>
+        </div>
+        <p class="notice-desc">Standard employee requester permissions enabled. Raise requests, track live SLAs, and collaborate on resolutions.</p>
+        <div class="scope-pills">
+          <span class="scope-pill">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2.5 7.5l3 3 6-6"/>
+            </svg>
+            Incident & Request Raising
+          </span>
+          <span class="scope-pill">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2.5 7.5l3 3 6-6"/>
+            </svg>
+            Live SLA Monitoring
+          </span>
+          <span class="scope-pill">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2.5 7.5l3 3 6-6"/>
+            </svg>
+            Ticket Communication
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Shortcuts -->
+    <div class="profile-actions">
+      <a routerLink="/user/raise-ticket" class="btn btn-primary" id="btn-profile-raise">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="10" y1="4" x2="10" y2="16"/>
+          <line x1="4" y1="10" x2="16" y2="10"/>
+        </svg>
+        <span>Raise Request</span>
+      </a>
+      <a routerLink="/user/tickets" class="btn btn-outline" id="btn-profile-tickets">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 6h12M4 10h12M4 14h8"/>
+        </svg>
+        <span>My Requests</span>
+      </a>
     </div>
   </div>
 </div>
