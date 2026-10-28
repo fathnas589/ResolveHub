@@ -10,7 +10,6 @@
       </div>
       <div>
         <h3 class="modal-title">{{ isEditMode ? 'Edit User' : 'Create New User' }}</h3>
-        <p class="modal-subtitle">Manage company identity, credentials, and access role</p>
       </div>
       <button type="button" class="close-btn" (click)="onCancel()" aria-label="Close modal">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
@@ -148,7 +147,7 @@
             [(ngModel)]="formData.isActive"
             name="isActive"
           />
-          <span class="checkbox-text">Active User (permitted to log in and receive tickets)</span>
+          <span class="checkbox-text">Active Account</span>
         </label>
       </div>
 

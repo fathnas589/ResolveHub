@@ -4,9 +4,6 @@
     <div class="modal-header">
       <div class="modal-header-text">
         <h2 class="modal-title">{{ isEditMode ? 'Edit Department' : 'Add Department' }}</h2>
-        <p class="modal-subtitle">
-          {{ isEditMode ? 'Update department information and routing status.' : 'Create a new organizational department for complaint routing.' }}
-        </p>
       </div>
       <button
         type="button"
@@ -51,8 +48,8 @@
             maxlength="100"
             autocomplete="off"
           />
-          <div class="field-footer">
-            @if (nameControl.invalid && (nameControl.dirty || nameControl.touched)) {
+          @if (nameControl.invalid && (nameControl.dirty || nameControl.touched)) {
+            <div class="field-footer">
               <span class="field-error">
                 @if (nameControl.errors?.['required']) {
                   Department name is required.
@@ -60,10 +57,8 @@
                   Maximum 100 characters allowed.
                 }
               </span>
-            } @else {
-              <span class="field-hint">Unique name within your organization</span>
-            }
-          </div>
+            </div>
+          }
         </div>
 
         <!-- Description Field -->
@@ -77,25 +72,20 @@
             class="form-textarea"
             [class.has-error]="descriptionControl.invalid && (descriptionControl.dirty || descriptionControl.touched)"
             formControlName="description"
-            placeholder="Briefly describe the responsibilities and ticket routing for this department..."
+            placeholder="Briefly describe the responsibilities and ticket routing..."
             maxlength="500"
           ></textarea>
-          <div class="field-footer">
-            @if (descriptionControl.invalid && (descriptionControl.dirty || descriptionControl.touched)) {
+          @if (descriptionControl.invalid && (descriptionControl.dirty || descriptionControl.touched)) {
+            <div class="field-footer">
               <span class="field-error">Maximum 500 characters allowed.</span>
-            } @else {
-              <span class="field-hint">Helps staff understand ticket assignment scope</span>
-            }
-          </div>
+            </div>
+          }
         </div>
 
         <!-- Professional Status Toggle Switch -->
         <div class="toggle-card">
           <div class="toggle-info">
             <span class="toggle-title">Active Department</span>
-            <span class="toggle-description">
-              Available for ticket creation, routing rules, and user assignment
-            </span>
           </div>
           <label class="toggle-switch" for="isActive">
             <input

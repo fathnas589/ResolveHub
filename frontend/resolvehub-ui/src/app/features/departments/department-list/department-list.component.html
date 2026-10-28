@@ -10,7 +10,7 @@
     </div>
 
     <div class="header-actions">
-      <button type="button" class="btn btn-primary" (click)="openCreateModal()">
+      <button type="button" class="btn btn-primary btn-create-glow" (click)="openCreateModal()">
         <svg class="btn-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
           <line x1="10" y1="4" x2="10" y2="16"/>
           <line x1="4" y1="10" x2="16" y2="10"/>
@@ -45,7 +45,7 @@
   <!-- KPI Summary Cards -->
   <div class="stats-grid">
     <!-- Card 1: Total Departments -->
-    <div class="stat-card">
+    <div class="stat-card" style="--card-accent: #3478F6;">
       <div class="stat-header">
         <span class="stat-label">Total Departments</span>
         <div class="stat-icon-wrapper stat-icon-primary">
@@ -57,11 +57,10 @@
         </div>
       </div>
       <div class="stat-value">{{ totalCount }}</div>
-      <div class="stat-subtext">Registered across organization</div>
     </div>
 
     <!-- Card 2: Active Departments -->
-    <div class="stat-card">
+    <div class="stat-card" style="--card-accent: #20D6B0;">
       <div class="stat-header">
         <span class="stat-label">Active Departments</span>
         <div class="stat-icon-wrapper stat-icon-success">
@@ -71,11 +70,10 @@
         </div>
       </div>
       <div class="stat-value stat-value-success">{{ activeDepartmentsCount }}</div>
-      <div class="stat-subtext">Available for live ticket routing</div>
     </div>
 
     <!-- Card 3: Inactive Departments -->
-    <div class="stat-card">
+    <div class="stat-card" style="--card-accent: #7487A4;">
       <div class="stat-header">
         <span class="stat-label">Inactive Departments</span>
         <div class="stat-icon-wrapper stat-icon-neutral">
@@ -86,7 +84,6 @@
         </div>
       </div>
       <div class="stat-value stat-value-neutral">{{ inactiveDepartmentsCount }}</div>
-      <div class="stat-subtext">Archived or paused from routing</div>
     </div>
   </div>
 

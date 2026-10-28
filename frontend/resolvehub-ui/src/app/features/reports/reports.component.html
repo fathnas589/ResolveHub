@@ -3,7 +3,7 @@
   <div class="page-header">
     <div class="header-left-col">
       <h1 class="page-title">SLA Analytics & Executive Reports</h1>
-      <p class="page-subtitle">Measure resolution compliance, departmental throughput, and team SLA performance</p>
+      <p class="page-subtitle">SLA compliance, resolution throughput, and departmental metrics</p>
     </div>
     <div class="header-actions">
       <!-- Period Selector -->
@@ -45,7 +45,7 @@
       <!-- Export CSV Button -->
       <button
         type="button"
-        class="btn btn-primary"
+        class="btn btn-primary btn-create-glow"
         (click)="exportCsv()"
         [disabled]="isExporting"
         title="Download CSV Audit Report"
@@ -72,7 +72,7 @@
     <!-- Executive KPI Grid -->
     <div class="kpi-grid">
       <!-- Overall Compliance -->
-      <div class="kpi-card compliance-card">
+      <div class="kpi-card compliance-card" style="--card-accent: #24D6A0;">
         <div class="kpi-icon-box kpi-emerald">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -86,7 +86,7 @@
       </div>
 
       <!-- Audited Tickets -->
-      <div class="kpi-card">
+      <div class="kpi-card" style="--card-accent: #3478F6;">
         <div class="kpi-icon-box kpi-blue">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -100,7 +100,7 @@
       </div>
 
       <!-- Resolved On Time -->
-      <div class="kpi-card">
+      <div class="kpi-card" style="--card-accent: #8955F6;">
         <div class="kpi-icon-box kpi-purple">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 6L9 17l-5-5"/>
@@ -113,7 +113,7 @@
       </div>
 
       <!-- SLA Breaches -->
-      <div class="kpi-card">
+      <div class="kpi-card" style="--card-accent: #FF5268;">
         <div class="kpi-icon-box kpi-rose">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -127,7 +127,7 @@
       </div>
 
       <!-- Avg Response Hours -->
-      <div class="kpi-card">
+      <div class="kpi-card" style="--card-accent: #6366F1;">
         <div class="kpi-icon-box kpi-indigo">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
@@ -141,7 +141,7 @@
       </div>
 
       <!-- Avg Resolution Hours -->
-      <div class="kpi-card">
+      <div class="kpi-card" style="--card-accent: #F5B942;">
         <div class="kpi-icon-box kpi-amber">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>

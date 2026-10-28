@@ -2,11 +2,11 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-left-col">
-      <h1 class="page-title">User Master Administration</h1>
-      <p class="page-subtitle">Manage company staff, support desk agents, permissions, and accounts</p>
+      <h1 class="page-title">User Directory & Accounts</h1>
+      <p class="page-subtitle">Manage enterprise personnel, roles, and access credentials</p>
     </div>
     <div class="header-actions">
-      <button type="button" class="btn btn-primary" (click)="openCreateUser()">
+      <button type="button" class="btn btn-primary btn-create-glow" (click)="openCreateUser()">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M10 5v10M5 10h10"/>
         </svg>
@@ -17,7 +17,7 @@
 
   <!-- KPI Metric Row -->
   <div class="kpi-grid">
-    <div class="kpi-card">
+    <div class="kpi-card" style="--card-accent: #3478F6;">
       <div class="kpi-icon-box kpi-blue">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" style="--card-accent: #FF5268;">
       <div class="kpi-icon-box kpi-rose">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" style="--card-accent: #8955F6;">
       <div class="kpi-icon-box kpi-purple">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" style="--card-accent: #24D6A0;">
       <div class="kpi-icon-box kpi-emerald">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <div class="kpi-card" [class.kpi-card-highlight]="pendingApprovalCount > 0">
+    <div class="kpi-card" style="--card-accent: #F5B942;" [class.kpi-card-highlight]="pendingApprovalCount > 0">
       <div class="kpi-icon-box kpi-amber">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"/>
