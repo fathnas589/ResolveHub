@@ -163,6 +163,33 @@
   flex-shrink: 0;
 }
 
+.header-theme-toggle-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.header-theme-toggle-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.header-theme-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* Company Badge */
 .company-badge {
   display: flex;

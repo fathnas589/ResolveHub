@@ -136,6 +136,43 @@
   box-shadow: 0 6px 20px rgba(52, 120, 246, 0.5) !important;
 }
 
+.last-updated-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+}
+
+.last-updated-pill svg {
+  width: 15px;
+  height: 15px;
+}
+
+.last-updated-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.updated-label {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.updated-time {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
 /* ==========================================================================
    KPI Cards Grid (Balanced 6 Cards Layout)
    ========================================================================== */
@@ -298,12 +335,55 @@
   letter-spacing: 0.06em;
 }
 
+.kpi-mid {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
 .kpi-value {
   font-size: 1.875rem;
   font-weight: 800;
   color: var(--text-primary, #F4F7FF);
   line-height: 1.15;
   letter-spacing: -0.02em;
+}
+
+.kpi-trend {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.kpi-trend small {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.trend-up { color: #24D6A0; }
+.trend-down { color: #FF5268; }
+.trend-neutral { color: var(--text-muted); }
+
+.kpi-sparkline {
+  margin-top: 0.35rem;
+  height: 22px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.kpi-sparkline svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 2px 4px currentColor);
+  opacity: 0.85;
 }
 
 .kpi-card.alert-glow {
@@ -320,12 +400,18 @@
 .text-teal { color: var(--accent-teal, #20D6B0) !important; }
 
 /* ==========================================================================
-   Analytics & Breakdown Charts Grid
+   Analytics & Breakdown Charts Grid (3 Columns Layout)
    ========================================================================== */
 .dashboard-charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-charts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .chart-card {
@@ -389,6 +475,107 @@
 .card-subtitle {
   font-size: 0.75rem;
   color: var(--text-muted, #7487A4);
+}
+
+/* Donut Pie Chart Container */
+.donut-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+  min-height: 140px;
+}
+
+.donut-chart-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.donut-circle {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+}
+
+.donut-circle:hover {
+  transform: scale(1.03);
+}
+
+.donut-hole {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: var(--bg-surface, #0D1D36);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.donut-total {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.donut-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.donut-legend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.8125rem;
+}
+
+.legend-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  color: var(--text-secondary);
+  font-weight: 600;
+  flex: 1;
+}
+
+.legend-count {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+}
+
+.legend-pct {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-width: 32px;
+  text-align: right;
+  font-weight: 500;
 }
 
 .distribution-list {

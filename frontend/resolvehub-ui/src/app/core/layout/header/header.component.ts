@@ -22,15 +22,33 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   currentPageTitle = 'Service Desk';
   currentSection = 'Operations';
+  currentTheme: 'dark' | 'light' = 'dark';
   private routerSub?: Subscription;
 
   ngOnInit(): void {
+    const savedTheme = (localStorage.getItem('resolvehub_theme') as 'dark' | 'light') || 'dark';
+    this.setTheme(savedTheme);
     this.updateBreadcrumbs(this.router.url);
     this.routerSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         this.updateBreadcrumbs(event.urlAfterRedirects || event.url);
       });
+  }
+
+  toggleTheme(): void {
+    const next = this.currentTheme === 'dark' ? 'light' : 'dark';
+    this.setTheme(next);
+  }
+
+  setTheme(theme: 'dark' | 'light'): void {
+    this.currentTheme = theme;
+    localStorage.setItem('resolvehub_theme', theme);
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
   }
 
   ngOnDestroy(): void {

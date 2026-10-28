@@ -18,6 +18,7 @@ export class DashboardComponent implements OnInit {
 
   metrics: DashboardMetricsResponse | null = null;
   isLoading = true;
+  lastUpdated: Date = new Date();
 
   ngOnInit(): void {
     this.loadMetrics();
@@ -29,6 +30,7 @@ export class DashboardComponent implements OnInit {
       next: data => {
         this.metrics = data;
         this.isLoading = false;
+        this.lastUpdated = new Date();
         this.cdr.markForCheck();
       },
       error: () => {
@@ -36,6 +38,27 @@ export class DashboardComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  getPriorityPercentage(count: number): number {
+    if (!this.metrics || !this.metrics.summary.totalTickets) return 0;
+    return Math.round((count / this.metrics.summary.totalTickets) * 100);
+  }
+
+  getPriorityConicGradient(): string {
+    if (!this.metrics || !this.metrics.summary.totalTickets || !this.metrics.priorityBreakdown.length) {
+      return 'conic-gradient(#3478F6 0% 100%)';
+    }
+    const total = this.metrics.summary.totalTickets;
+    let currentAngle = 0;
+    const segments: string[] = [];
+    for (const p of this.metrics.priorityBreakdown) {
+      const pct = (p.count / total) * 100;
+      const color = this.getPriorityColor(p.name);
+      segments.push(`${color} ${currentAngle.toFixed(1)}% ${(currentAngle + pct).toFixed(1)}%`);
+      currentAngle += pct;
+    }
+    return `conic-gradient(${segments.join(', ')})`;
   }
 
   viewTicket(gId: string): void {
