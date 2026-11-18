@@ -2,18 +2,6 @@ import { Routes } from '@angular/router';
 import { inject } from '@angular/core';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { DepartmentListComponent } from './features/departments/department-list/department-list.component';
-import { TicketListComponent } from './features/tickets/ticket-list/ticket-list.component';
-import { SlaPolicyListComponent } from './features/sla-policies/sla-policy-list/sla-policy-list.component';
-import { CategoryListComponent } from './features/categories/category-list/category-list.component';
-import { UserListComponent } from './features/users/user-list/user-list.component';
-import { PriorityListComponent } from './features/priorities/priority-list/priority-list.component';
-import { ReportsComponent } from './features/reports/reports.component';
-import { UserDashboardComponent } from './features/user/user-dashboard/user-dashboard.component';
-import { UserRaiseTicketComponent } from './features/user/user-raise-ticket/user-raise-ticket.component';
-import { UserTicketsComponent } from './features/user/user-tickets/user-tickets.component';
-import { UserProfileComponent } from './features/user/user-profile/user-profile.component';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { AuthService } from './core/services/auth.service';
@@ -46,49 +34,56 @@ export const routes: Routes = [
   // Admin & Operations Portal routes
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'AGENT'] }
   },
   {
     path: 'departments',
-    component: DepartmentListComponent,
+    loadComponent: () => import('./features/departments/department-list/department-list.component').then(m => m.DepartmentListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
   {
     path: 'tickets',
-    component: TicketListComponent,
+    loadComponent: () => import('./features/tickets/ticket-list/ticket-list.component').then(m => m.TicketListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'AGENT'] }
+  },
+  {
+    // Deep link to a single ticket (used by notifications and the dashboard); opens the detail drawer.
+    path: 'tickets/:gId',
+    loadComponent: () => import('./features/tickets/ticket-list/ticket-list.component').then(m => m.TicketListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'AGENT'] }
   },
   {
     path: 'sla-policies',
-    component: SlaPolicyListComponent,
+    loadComponent: () => import('./features/sla-policies/sla-policy-list/sla-policy-list.component').then(m => m.SlaPolicyListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'AGENT'] }
   },
   {
     path: 'categories',
-    component: CategoryListComponent,
+    loadComponent: () => import('./features/categories/category-list/category-list.component').then(m => m.CategoryListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'AGENT'] }
   },
   {
     path: 'priorities',
-    component: PriorityListComponent,
+    loadComponent: () => import('./features/priorities/priority-list/priority-list.component').then(m => m.PriorityListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'AGENT'] }
   },
   {
     path: 'users',
-    component: UserListComponent,
+    loadComponent: () => import('./features/users/user-list/user-list.component').then(m => m.UserListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
   {
     path: 'reports',
-    component: ReportsComponent,
+    loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'AGENT'] }
   },
@@ -96,25 +91,31 @@ export const routes: Routes = [
   // User Requester Portal routes (Phase C)
   {
     path: 'user/dashboard',
-    component: UserDashboardComponent,
+    loadComponent: () => import('./features/user/user-dashboard/user-dashboard.component').then(m => m.UserDashboardComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['USER'], pageTitle: 'User Dashboard' }
   },
   {
     path: 'user/raise-ticket',
-    component: UserRaiseTicketComponent,
+    loadComponent: () => import('./features/user/user-raise-ticket/user-raise-ticket.component').then(m => m.UserRaiseTicketComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['USER'], pageTitle: 'Raise Request' }
   },
   {
     path: 'user/tickets',
-    component: UserTicketsComponent,
+    loadComponent: () => import('./features/user/user-tickets/user-tickets.component').then(m => m.UserTicketsComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['USER'], pageTitle: 'My Requests' }
+  },
+  {
+    path: 'user/tickets/:gId',
+    loadComponent: () => import('./features/user/user-tickets/user-tickets.component').then(m => m.UserTicketsComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['USER'], pageTitle: 'My Requests' }
   },
   {
     path: 'user/profile',
-    component: UserProfileComponent,
+    loadComponent: () => import('./features/user/user-profile/user-profile.component').then(m => m.UserProfileComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['USER'], pageTitle: 'Profile' }
   },

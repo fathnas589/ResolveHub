@@ -13,13 +13,31 @@ BEGIN
 
     DECLARE @ClaimedIds TABLE (DeliveryId INT PRIMARY KEY);
 
+    -- Deliveries whose recipient has since been deactivated/deleted can never be sent.
+    -- Retire them up front; otherwise they'd be claimed (PROCESSING) but never returned to the worker.
+    UPDATE nd
+    SET nd.Status = N'DEAD_LETTER',
+        nd.LastUpd = @CurrentUtc
+    FROM dbo.NotificationDelivery nd
+    INNER JOIN dbo.NotificationRecipient nr ON nd.NotificationRecipientId = nr.Id
+    INNER JOIN dbo.UserMaster u ON nr.RecipientUserId = u.Id
+    WHERE nd.Status IN (N'PENDING', N'FAILED')
+      AND (u.IsActive = 0 OR u.IsDeleted = 1);
+
     -- Atomically select and update eligible deliveries with lock hints
     ;WITH EligibleDeliveries AS
     (
         SELECT TOP (@BatchSize) nd.Id
         FROM dbo.NotificationDelivery nd WITH (UPDLOCK, READPAST)
-        WHERE nd.Status IN (N'PENDING', N'FAILED')
-          AND nd.NextAttemptAt <= @CurrentUtc
+        WHERE (
+                nd.Status IN (N'PENDING', N'FAILED')
+                AND nd.NextAttemptAt <= @CurrentUtc
+              )
+              -- Reclaim rows left in PROCESSING by a crash/shutdown mid-batch.
+              OR (
+                nd.Status = N'PROCESSING'
+                AND nd.LastAttemptAt < DATEADD(MINUTE, -15, @CurrentUtc)
+              )
         ORDER BY nd.NextAttemptAt ASC, nd.Id ASC
     )
     UPDATE nd

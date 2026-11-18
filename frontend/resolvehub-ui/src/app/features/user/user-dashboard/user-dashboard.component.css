@@ -578,7 +578,7 @@
   border: 1px solid rgba(116, 135, 164, 0.3);
 }
 
-.badge-status-reopened {
+.badge-status-rejected {
   background: rgba(255, 82, 104, 0.14);
   color: #ff7e8e;
   border: 1px solid rgba(255, 82, 104, 0.32);

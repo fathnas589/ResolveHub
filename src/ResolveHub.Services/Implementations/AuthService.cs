@@ -1,6 +1,7 @@
 namespace ResolveHub.Services.Implementations;
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -120,13 +121,29 @@ public class AuthService : IAuthService
         }
 
         string trimmedEmail = request.Email.Trim().ToLowerInvariant();
-        string userName = trimmedEmail.Split('@')[0];
+        string baseUserName = trimmedEmail.Split('@')[0];
+        if (baseUserName.Length > 90)
+        {
+            baseUserName = baseUserName[..90];
+        }
 
         // Check for existing user
-        var existing = await _userRepository.GetForLoginAsync(companyId, trimmedEmail);
-        if (existing is not null)
+        var (_, isDuplicateEmail) = await _userRepository.CheckDuplicateAsync(companyId, null, trimmedEmail);
+        if (isDuplicateEmail)
         {
             throw new InvalidOperationException($"An account with email '{trimmedEmail}' already exists.");
+        }
+
+        // The username is derived from the email's local part, which may already be taken
+        // (e.g. john@a.com vs john@b.com). Append a numeric suffix until it is unique.
+        string userName = baseUserName;
+        for (int suffix = 1; (await _userRepository.CheckDuplicateAsync(companyId, userName, null)).isDuplicateUserName; suffix++)
+        {
+            if (suffix > 1000)
+            {
+                throw new InvalidOperationException("Unable to generate a unique username. Please contact an administrator.");
+            }
+            userName = $"{baseUserName}{suffix}";
         }
 
         string passwordHash = _passwordHasher.HashPassword(userName, request.Password);
@@ -156,15 +173,22 @@ public class AuthService : IAuthService
         {
             try
             {
-                var adminRecord = await _userRepository.GetForLoginAsync(companyId, "admin");
-                if (adminRecord is not null)
+                // Notify every active administrator (not just a user literally named "admin").
+                var admins = await _userRepository.GetListingAsync(companyId, new ResolveHub.Core.DTOs.Users.UserListRequestDto
+                {
+                    RoleCode = "ADMIN",
+                    IsActive = true,
+                    PageSize = 100
+                });
+                var adminIds = admins?.Items?.Where(a => a.Id > 0).Select(a => a.Id).ToArray() ?? Array.Empty<int>();
+                if (adminIds.Length > 0)
                 {
                     await _notificationService.PublishAsync(new NotificationEvent
                     {
                         EventType = NotificationEventTypes.UserAccountCreated,
                         CompanyId = companyId,
                         ActorUserId = created.Id,
-                        RecipientUserIds = new[] { adminRecord.Id },
+                        RecipientUserIds = adminIds,
                         Title = "New Registration Awaiting Approval",
                         Message = $"Requester {created.FullName} ({created.Email}) registered and is awaiting administrator approval.",
                         ActionUrl = "/users",

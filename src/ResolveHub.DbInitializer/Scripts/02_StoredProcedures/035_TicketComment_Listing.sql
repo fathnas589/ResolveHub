@@ -46,7 +46,8 @@ BEGIN
         tc.Created,
         u.GId AS AuthorUserGId,
         u.UserName AS AuthorUserName,
-        u.FullName AS AuthorFullName
+        u.FullName AS AuthorFullName,
+        u.RoleCode AS AuthorRoleCode
     FROM dbo.TicketComment tc
     INNER JOIN dbo.UserMaster u ON tc.CreatedByUserId = u.Id
     WHERE tc.TicketId = @TicketId

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using ResolveHub.Api.Infrastructure;
 using ResolveHub.Core.Interfaces.Repositories;
 using ResolveHub.DataAccess.Connection;
 using ResolveHub.DataAccess.Repositories;
@@ -37,7 +38,16 @@ builder.Services.AddCors(options =>
 });
 
 // Add controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Timestamps are stored as UTC; make sure clients receive them with a 'Z' suffix.
+        options.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
+    });
+
+// Consistent JSON error responses for unhandled exceptions (e.g. RAISERROR from stored procedures)
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // JWT Authentication Configuration
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "ResolveHub";
@@ -133,6 +143,8 @@ builder.Services.AddHostedService<ResolveHub.Services.Workers.SlaMonitoringWorke
 builder.Services.AddHostedService<ResolveHub.Services.Workers.NotificationDeliveryWorker>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

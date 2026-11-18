@@ -65,7 +65,8 @@ public class SlaMonitoringWorker : BackgroundService
                                     warning.TicketGId,
                                     warning.TicketNumber,
                                     warning.Subject,
-                                    warning.AssignedToUserId);
+                                    warning.AssignedToUserId,
+                                    warning.EscalationDueAt);
                             }
                             catch (Exception ex)
                             {
@@ -93,7 +94,8 @@ public class SlaMonitoringWorker : BackgroundService
                                     breach.TicketNumber,
                                     breach.Subject,
                                     breach.BreachType,
-                                    breach.AssignedToUserId);
+                                    breach.AssignedToUserId,
+                                    breach.DueAt);
                             }
                             catch (Exception ex)
                             {

@@ -34,6 +34,14 @@ public class NotificationDeliveryWorker : BackgroundService
             return;
         }
 
+        // With email disabled the sender would report every delivery as sent (mock), permanently
+        // marking queued emails DELIVERED. Leave them PENDING so they go out once SMTP is enabled.
+        if (!_configuration.GetValue<bool>("Email:Enabled", false))
+        {
+            _logger.LogInformation("Notification Delivery Worker is idle because Email:Enabled is false; queued deliveries remain PENDING.");
+            return;
+        }
+
         int intervalSeconds = _configuration.GetValue<int>("NotificationDelivery:PollIntervalSeconds", 15);
         if (intervalSeconds <= 0)
         {

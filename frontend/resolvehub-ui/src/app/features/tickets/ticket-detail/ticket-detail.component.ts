@@ -201,7 +201,7 @@ export class TicketDetailComponent implements OnInit, OnChanges {
   }
 
   canChangeStatus(): boolean {
-    return this.authService.isStaff() && this.ticket !== null && this.ticket.status !== 'CLOSED' && this.ticket.status !== 'CANCELLED';
+    return this.authService.isStaff() && this.ticket !== null && this.ticket.status !== 'CLOSED' && this.ticket.status !== 'REJECTED';
   }
 
   canUserClose(): boolean {

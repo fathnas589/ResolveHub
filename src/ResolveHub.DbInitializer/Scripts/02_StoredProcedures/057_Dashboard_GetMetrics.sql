@@ -9,12 +9,12 @@ BEGIN
     -- 1. High-Level KPI Summary
     SELECT
         COUNT(1) AS TotalTickets,
-        ISNULL(SUM(CASE WHEN t.Status IN ('NEW', 'ASSIGNED', 'OPEN') THEN 1 ELSE 0 END), 0) AS OpenTickets,
+        ISNULL(SUM(CASE WHEN t.Status IN ('OPEN', 'ASSIGNED', 'PENDING_USER') THEN 1 ELSE 0 END), 0) AS OpenTickets,
         ISNULL(SUM(CASE WHEN t.Status = 'IN_PROGRESS' THEN 1 ELSE 0 END), 0) AS InProgressTickets,
         ISNULL(SUM(CASE WHEN t.Status IN ('RESOLVED', 'CLOSED') AND (ts.ResolvedAt >= @TodayStartUtc OR (ts.ResolvedAt IS NULL AND t.LastUpd >= @TodayStartUtc)) THEN 1 ELSE 0 END), 0) AS ResolvedToday,
         ISNULL(SUM(CASE WHEN (ts.FirstResponseBreached = 1 OR ts.ResolutionBreached = 1) THEN 1 ELSE 0 END), 0) AS BreachedTickets,
-        ISNULL(SUM(CASE WHEN t.Status NOT IN ('RESOLVED', 'CLOSED') AND ts.ResolutionBreached = 0 AND ts.ResolutionDueAt IS NOT NULL AND ts.ResolutionDueAt < DATEADD(hour, 4, SYSUTCDATETIME()) THEN 1 ELSE 0 END), 0) AS WarningTickets,
-        ISNULL(AVG(CASE WHEN ts.FirstRespondedAt IS NOT NULL THEN CAST(DATEDIFF(minute, ts.Created, ts.FirstRespondedAt) AS FLOAT) / 60.0 ELSE NULL END), 1.2) AS AvgResponseHours
+        ISNULL(SUM(CASE WHEN t.Status NOT IN ('RESOLVED', 'CLOSED', 'REJECTED') AND ts.ResolutionBreached = 0 AND ts.ResolutionDueAt IS NOT NULL AND ts.ResolutionDueAt < DATEADD(hour, 4, SYSUTCDATETIME()) THEN 1 ELSE 0 END), 0) AS WarningTickets,
+        ISNULL(AVG(CASE WHEN ts.FirstRespondedAt IS NOT NULL THEN CAST(DATEDIFF(minute, ts.Created, ts.FirstRespondedAt) AS FLOAT) / 60.0 ELSE NULL END), 0.0) AS AvgResponseHours
     FROM dbo.Ticket t
     LEFT JOIN dbo.TicketSla ts ON ts.TicketId = t.Id
     WHERE t.CompanyId = @CompanyId AND t.IsDeleted = 0;

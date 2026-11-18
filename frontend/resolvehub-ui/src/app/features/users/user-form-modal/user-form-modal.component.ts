@@ -6,6 +6,7 @@ import { Department } from '../../../models/department.model';
 import { DepartmentService } from '../../../services/department.service';
 import { UserService } from '../../../services/user.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { getPasswordPolicyError } from '../../../core/utils/password-policy';
 
 @Component({
   selector: 'app-user-form-modal',
@@ -80,9 +81,14 @@ export class UserFormModalComponent implements OnInit {
     if (!this.formData.userName.trim()) {
       this.formData.userName = this.formData.email.split('@')[0];
     }
-    if (!this.isEditMode && !this.formData.password) {
-      this.errorMessage = 'Initial password is required for new users.';
-      return;
+    if (!this.isEditMode) {
+      const policyError = this.formData.password
+        ? getPasswordPolicyError(this.formData.password)
+        : 'Initial password is required for new users.';
+      if (policyError) {
+        this.errorMessage = policyError;
+        return;
+      }
     }
 
     this.isSaving = true;

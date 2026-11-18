@@ -236,6 +236,14 @@ public class UserService : IUserService
             throw new InvalidOperationException($"Another user with email '{trimmedEmail}' already exists for this company.");
         }
 
+        // Prevent an administrator from locking themselves out by demoting or deactivating their own account.
+        var existingUser = await _userRepository.GetByGIdAsync(companyId, gId);
+        if (existingUser is not null && existingUser.Id == lastUpdBy &&
+            existingUser.RoleCode == "ADMIN" && (normalizedRole != "ADMIN" || !request.IsActive))
+        {
+            throw new InvalidOperationException("You cannot demote or deactivate your own administrator account.");
+        }
+
         var userEntity = new UserMaster
         {
             CompanyId = companyId,
@@ -265,6 +273,12 @@ public class UserService : IUserService
         if (companyId <= 0)
         {
             throw new ArgumentException("Invalid company ID.", nameof(companyId));
+        }
+
+        var existingUser = await _userRepository.GetByGIdAsync(companyId, gId);
+        if (existingUser is not null && existingUser.Id == lastUpdBy)
+        {
+            throw new ArgumentException("You cannot delete your own account.", nameof(gId));
         }
 
         return await _userRepository.DeleteAsync(companyId, gId, lastUpdBy);

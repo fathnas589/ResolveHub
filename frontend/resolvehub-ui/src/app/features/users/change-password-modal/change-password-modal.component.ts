@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { User } from '../../../models/user.model';
 import { UserService } from '../../../services/user.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { getPasswordPolicyError } from '../../../core/utils/password-policy';
 
 @Component({
   selector: 'app-change-password-modal',
@@ -31,8 +32,9 @@ export class ChangePasswordModalComponent {
       this.errorMessage = 'Please enter a new password.';
       return;
     }
-    if (this.newPassword.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters.';
+    const policyError = getPasswordPolicyError(this.newPassword);
+    if (policyError) {
+      this.errorMessage = policyError;
       return;
     }
     if (this.newPassword !== this.confirmPassword) {

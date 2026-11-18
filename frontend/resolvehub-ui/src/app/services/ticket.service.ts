@@ -14,12 +14,14 @@ import {
   TicketHistory
 } from '../models/ticket.model';
 import { PagedResult } from '../models/paged-result.model';
+import { AuthService } from '../core/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketService {
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly baseUrl = `${API_CONFIG.baseUrl}/Ticket`;
 
   /**
@@ -50,12 +52,15 @@ export class TicketService {
       params = params.set('ticketType', request.ticketType);
     }
 
-    if (request.assignedToUserGId) {
-      params = params.set('assignedToUserGId', request.assignedToUserGId);
+    // The backend has no "myTicketsOnly" flag. Requesters (USER) are already scoped to their own
+    // tickets server-side; for staff, "my tickets" means tickets assigned to me.
+    let assignedToUserGId = request.assignedToUserGId;
+    if (!assignedToUserGId && request.myTicketsOnly && this.authService.isStaff()) {
+      assignedToUserGId = this.authService.currentUser()?.gId;
     }
 
-    if (request.myTicketsOnly !== undefined) {
-      params = params.set('myTicketsOnly', request.myTicketsOnly.toString());
+    if (assignedToUserGId) {
+      params = params.set('assignedToUserGId', assignedToUserGId);
     }
 
     return this.http.get<PagedResult<Ticket>>(this.baseUrl, { params });

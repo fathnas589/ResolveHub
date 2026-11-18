@@ -286,7 +286,8 @@ public class NotificationService : INotificationService
         Guid ticketGId,
         string ticketNumber,
         string subject,
-        int? assignedToUserId)
+        int? assignedToUserId,
+        DateTime? dueAtUtc = null)
     {
         var recipients = new List<int>();
         if (assignedToUserId.HasValue && assignedToUserId.Value > 0)
@@ -322,7 +323,7 @@ public class NotificationService : INotificationService
             Title = copy.Title,
             Message = copy.Message,
             ActionUrl = copy.ActionUrl,
-            CorrelationKey = $"SLA_WARNING:{ticketId}"
+            CorrelationKey = dueAtUtc.HasValue ? $"SLA_WARNING:{ticketId}:{dueAtUtc.Value:yyyyMMddHHmmss}" : $"SLA_WARNING:{ticketId}"
         });
     }
 
@@ -333,7 +334,8 @@ public class NotificationService : INotificationService
         string ticketNumber,
         string subject,
         string breachType,
-        int? assignedToUserId)
+        int? assignedToUserId,
+        DateTime? dueAtUtc = null)
     {
         var recipients = new List<int>();
         if (assignedToUserId.HasValue && assignedToUserId.Value > 0)
@@ -373,7 +375,7 @@ public class NotificationService : INotificationService
             Title = copy.Title,
             Message = copy.Message,
             ActionUrl = copy.ActionUrl,
-            CorrelationKey = $"{eventType}:{ticketId}"
+            CorrelationKey = dueAtUtc.HasValue ? $"{eventType}:{ticketId}:{dueAtUtc.Value:yyyyMMddHHmmss}" : $"{eventType}:{ticketId}"
         });
     }
 
@@ -385,7 +387,7 @@ public class NotificationService : INotificationService
             var admins = await _userRepository.GetListingAsync(companyId, new ResolveHub.Core.DTOs.Users.UserListRequestDto
             {
                 RoleCode = "ADMIN",
-                PageSize = 50,
+                PageSize = 100,
                 IsActive = true
             });
 

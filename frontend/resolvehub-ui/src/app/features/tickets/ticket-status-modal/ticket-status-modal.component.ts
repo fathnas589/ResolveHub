@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Ticket, TicketStatus, VALID_STATUS_TRANSITIONS } from '../../../models/ticket.model';
+import { Ticket, TicketStatus, getAllowedNextStatuses } from '../../../models/ticket.model';
 import { TicketService } from '../../../services/ticket.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-ticket-status-modal',
@@ -19,6 +20,7 @@ export class TicketStatusModalComponent implements OnInit {
 
   private readonly ticketService = inject(TicketService);
   private readonly toastService = inject(ToastService);
+  private readonly authService = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   validNextStatuses: TicketStatus[] = [];
@@ -28,7 +30,7 @@ export class TicketStatusModalComponent implements OnInit {
   errorMessage: string | null = null;
 
   ngOnInit(): void {
-    this.validNextStatuses = VALID_STATUS_TRANSITIONS[this.ticket.status] || [];
+    this.validNextStatuses = getAllowedNextStatuses(this.ticket.status, this.authService.currentUser()?.role);
     if (this.validNextStatuses.length > 0) {
       this.selectedStatus = this.validNextStatuses[0];
     }

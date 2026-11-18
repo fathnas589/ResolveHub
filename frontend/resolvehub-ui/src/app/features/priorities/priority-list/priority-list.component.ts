@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { TicketService } from '../../../services/ticket.service';
 
 export interface PriorityInfo {
-  code: 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+  code: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
   name: string;
   badgeClass: string;
   responseTarget: string;
@@ -29,8 +29,8 @@ export class PriorityListComponent implements OnInit {
 
   priorities: PriorityInfo[] = [
     {
-      code: 'URGENT',
-      name: 'Urgent Priority',
+      code: 'CRITICAL',
+      name: 'Critical Priority',
       badgeClass: 'badge-urgent',
       responseTarget: '< 1 Hour',
       resolutionTarget: '< 4 Hours',
@@ -91,8 +91,8 @@ export class PriorityListComponent implements OnInit {
   ];
 
   matrixRows = [
-    { impact: 'Critical Enterprise Impact', urgent: 'URGENT', high: 'URGENT', medium: 'HIGH', low: 'MEDIUM' },
-    { impact: 'Department / Group Impact', urgent: 'URGENT', high: 'HIGH', medium: 'MEDIUM', low: 'LOW' },
+    { impact: 'Critical Enterprise Impact', urgent: 'CRITICAL', high: 'CRITICAL', medium: 'HIGH', low: 'MEDIUM' },
+    { impact: 'Department / Group Impact', urgent: 'CRITICAL', high: 'HIGH', medium: 'MEDIUM', low: 'LOW' },
     { impact: 'Individual User Impact', urgent: 'HIGH', high: 'MEDIUM', medium: 'LOW', low: 'LOW' }
   ];
 
@@ -104,7 +104,7 @@ export class PriorityListComponent implements OnInit {
     this.ticketService.getTickets({ pageNumber: 1, pageSize: 100 }).subscribe({
       next: res => {
         const items = res.items || [];
-        const openItems = items.filter(t => t.status !== 'RESOLVED' && t.status !== 'CLOSED');
+        const openItems = items.filter(t => t.status !== 'RESOLVED' && t.status !== 'CLOSED' && t.status !== 'REJECTED');
 
         for (const p of this.priorities) {
           p.activeTicketCount = openItems.filter(t => t.priority === p.code).length;

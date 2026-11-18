@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TicketService } from '../../../services/ticket.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Ticket, TicketListRequest, TicketPriority, TicketStatus, TicketType } from '../../../models/ticket.model';
@@ -18,6 +18,7 @@ export class UserTicketsComponent implements OnInit {
   private readonly ticketService = inject(TicketService);
   readonly authService = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
 
   tickets: Ticket[] = [];
   totalCount = 0;
@@ -46,7 +47,7 @@ export class UserTicketsComponent implements OnInit {
     { value: 'PENDING_USER', label: 'Pending My Input' },
     { value: 'RESOLVED', label: 'Resolved' },
     { value: 'CLOSED', label: 'Closed' },
-    { value: 'REOPENED', label: 'Reopened' }
+    { value: 'REJECTED', label: 'Rejected' }
   ];
 
   readonly priorityOptions: { value: string; label: string }[] = [
@@ -64,6 +65,11 @@ export class UserTicketsComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    // Deep link: /user/tickets/:gId (e.g. from a notification) opens the ticket detail drawer.
+    const deepLinkGId = this.route.snapshot.paramMap.get('gId');
+    if (deepLinkGId) {
+      this.selectedTicketGId = deepLinkGId;
+    }
     this.loadTickets();
   }
 
@@ -139,7 +145,7 @@ export class UserTicketsComponent implements OnInit {
       case 'PENDING_USER': return 'badge-status-pending';
       case 'RESOLVED': return 'badge-status-resolved';
       case 'CLOSED': return 'badge-status-closed';
-      case 'REOPENED': return 'badge-status-reopened';
+      case 'REJECTED': return 'badge-status-rejected';
       default: return 'badge-status-default';
     }
   }

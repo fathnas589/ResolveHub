@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SlaPolicyService } from '../../../services/sla-policy.service';
 import { DepartmentService } from '../../../services/department.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { SlaPolicy, SlaPolicyListRequest } from '../../../models/sla-policy.model';
 import { Department } from '../../../models/department.model';
 import { SlaPolicyFormModalComponent } from '../sla-policy-form-modal/sla-policy-form-modal.component';
@@ -19,6 +20,10 @@ export class SlaPolicyListComponent implements OnInit {
   private readonly slaPolicyService = inject(SlaPolicyService);
   private readonly departmentService = inject(DepartmentService);
   private readonly toastService = inject(ToastService);
+  private readonly authService = inject(AuthService);
+
+  /** Create/edit/delete are ADMIN-only on the backend; agents get a read-only view. */
+  readonly canManage = this.authService.isAdmin();
   private readonly cdr = inject(ChangeDetectorRef);
 
   policies: SlaPolicy[] = [];

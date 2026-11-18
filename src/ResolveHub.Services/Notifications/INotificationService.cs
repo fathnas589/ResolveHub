@@ -19,6 +19,6 @@ public interface INotificationService
     Task PublishTicketAssignedAsync(int companyId, int ticketId, Guid ticketGId, string ticketNumber, string subject, int assignedToUserId, int? actorUserId, string? actorName, bool isReassignment = false);
     Task PublishTicketCommentAddedAsync(int companyId, int ticketId, Guid ticketGId, string ticketNumber, string subject, int commentAuthorUserId, string commentAuthorName, bool isAuthorStaff, int ticketRequesterUserId, int? assignedToUserId);
     Task PublishTicketStatusChangedAsync(int companyId, int ticketId, Guid ticketGId, string ticketNumber, string subject, string oldStatus, string newStatus, int actorUserId, string actorName, int ticketRequesterUserId, int? assignedToUserId);
-    Task PublishSlaWarningAsync(int companyId, int ticketId, Guid ticketGId, string ticketNumber, string subject, int? assignedToUserId);
-    Task PublishSlaBreachAsync(int companyId, int ticketId, Guid ticketGId, string ticketNumber, string subject, string breachType, int? assignedToUserId);
+    Task PublishSlaWarningAsync(int companyId, int ticketId, Guid ticketGId, string ticketNumber, string subject, int? assignedToUserId, DateTime? dueAtUtc = null);
+    Task PublishSlaBreachAsync(int companyId, int ticketId, Guid ticketGId, string ticketNumber, string subject, string breachType, int? assignedToUserId, DateTime? dueAtUtc = null);
 }

@@ -22,5 +22,7 @@ BEGIN
     FROM dbo.UserMaster u
     LEFT JOIN dbo.Department d ON u.DepartmentId = d.Id
     WHERE u.CompanyId = @CompanyId
-      AND (u.UserName = @UserNameOrEmail OR u.Email = @UserNameOrEmail);
+      AND u.IsDeleted = 0
+      AND (u.UserName = @UserNameOrEmail OR u.Email = @UserNameOrEmail)
+    ORDER BY u.Id DESC;
 END;

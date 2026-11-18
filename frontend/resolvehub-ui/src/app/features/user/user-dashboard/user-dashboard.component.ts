@@ -75,7 +75,7 @@ export class UserDashboardComponent implements OnInit {
 
     for (const t of tickets) {
       const status = t.status?.toUpperCase();
-      if (status === 'OPEN' || status === 'REOPENED') {
+      if (status === 'OPEN') {
         openCount++;
       } else if (status === 'ASSIGNED' || status === 'IN_PROGRESS' || status === 'PENDING_USER') {
         inProgressCount++;
@@ -113,7 +113,7 @@ export class UserDashboardComponent implements OnInit {
       case 'PENDING_USER': return 'badge-status-pending';
       case 'RESOLVED': return 'badge-status-resolved';
       case 'CLOSED': return 'badge-status-closed';
-      case 'REOPENED': return 'badge-status-reopened';
+      case 'REJECTED': return 'badge-status-rejected';
       default: return 'badge-status-default';
     }
   }

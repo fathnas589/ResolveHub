@@ -12,4 +12,5 @@ public class TicketCommentResponseDto
     public Guid AuthorUserGId { get; set; }
     public string AuthorUserName { get; set; } = string.Empty;
     public string AuthorFullName { get; set; } = string.Empty;
+    public string AuthorRoleCode { get; set; } = string.Empty;
 }

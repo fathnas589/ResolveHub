@@ -179,8 +179,9 @@ export class DepartmentListComponent implements OnInit {
   }
 
   onFormSaved(message: string): void {
+    const wasEdit = this.selectedDepartmentForEdit !== null; // capture before closeFormModal() clears it
     this.closeFormModal();
-    this.toastService.success(this.selectedDepartmentForEdit ? 'Department Updated' : 'Department Created', message);
+    this.toastService.success(wasEdit ? 'Department Updated' : 'Department Created', message);
     this.loadDepartments();
   }
 

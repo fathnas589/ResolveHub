@@ -52,5 +52,11 @@ BEGIN
     FROM dbo.TicketHistory th
     INNER JOIN dbo.UserMaster u ON th.CreatedByUserId = u.Id
     WHERE th.TicketId = @TicketId
+      -- Requesters must not learn that internal (staff-only) comments exist.
+      AND NOT (
+          @RequestingRole = 'USER'
+          AND th.ActionType = 'COMMENT_ADDED'
+          AND th.Comments = 'Internal comment added'
+      )
     ORDER BY th.Created ASC, th.Id ASC;
 END;

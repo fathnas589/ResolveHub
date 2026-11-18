@@ -20,8 +20,8 @@ export class LoginComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   companyId: number = 1;
-  userNameOrEmail = 'admin';
-  password = 'Admin@123';
+  userNameOrEmail = '';
+  password = '';
   isLoading = false;
   errorMessage: string | null = null;
 
@@ -57,7 +57,7 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.userNameOrEmail.trim() || !this.password.trim()) {
+    if (!this.userNameOrEmail.trim() || !this.password) {
       this.errorMessage = 'Please enter both username and password.';
       return;
     }
@@ -66,7 +66,7 @@ export class LoginComponent implements OnInit {
     this.errorMessage = null;
     this.cdr.markForCheck();
 
-    this.authService.login(this.userNameOrEmail.trim(), this.password.trim(), this.companyId).subscribe({
+    this.authService.login(this.userNameOrEmail.trim(), this.password, this.companyId).subscribe({
       next: (res) => {
         this.isLoading = false;
         this.toastService.success(`Welcome back, ${res.user.fullName}!`);

@@ -22,6 +22,11 @@ export class App {
   );
 
   constructor() {
+    // Apply the saved theme at bootstrap so auth pages (which have no header) honour it too.
+    if (localStorage.getItem('resolvehub_theme') === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {

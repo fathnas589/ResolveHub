@@ -57,6 +57,8 @@ export class AuthService {
 
     return {
       ...user,
+      // /api/Auth/me returns `userGId`, while the login response returns `gId`.
+      gId: user?.gId || user?.userGId,
       role: role as 'ADMIN' | 'AGENT' | 'USER',
       roleCode: user?.roleCode || role
     };
@@ -94,7 +96,8 @@ export class AuthService {
   getMe(): Observable<UserProfile> {
     return this.http.get<any>(`${this.authUrl}/me`).pipe(
       tap(user => {
-        const normalized = this.normalizeUser(user, this.token() || undefined);
+        // Merge with the stored profile so fields not returned by /me (e.g. phone) are not lost.
+        const normalized = this.normalizeUser({ ...(this.currentUser() || {}), ...user }, this.token() || undefined);
         this.currentUser.set(normalized);
         localStorage.setItem('rh_user', JSON.stringify(normalized));
       })
@@ -126,6 +129,19 @@ export class AuthService {
     localStorage.removeItem('rh_token');
     localStorage.removeItem('rh_user');
     localStorage.removeItem('rh_persona_id');
+  }
+
+  /** True when there is no token or its JWT `exp` claim is in the past. */
+  isTokenExpired(token: string | null = this.token()): boolean {
+    if (!token) {
+      return true;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now();
+    } catch {
+      return false; // Not a decodable JWT; let the server decide.
+    }
   }
 
   isAdmin(): boolean {

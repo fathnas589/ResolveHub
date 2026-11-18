@@ -98,16 +98,16 @@ export class UserService {
       .set('companyId', companyId.toString())
       .set('userId', userId.toString());
     const body: ChangePasswordRequest = { newPassword };
-    return this.http.post<void>(`${this.baseUrl}/${gId}/change-password`, body, { params });
+    return this.http.put<void>(`${this.baseUrl}/${gId}/password`, body, { params });
   }
 
   getAgentsByDepartment(departmentGId?: string): Observable<PagedResult<User>> {
-    return this.getUsers({
-      roleCode: 'AGENT',
-      departmentGId: departmentGId || undefined,
-      isActive: true,
-      pageSize: 100
-    });
+    // Uses the ADMIN+AGENT lookup endpoint; the general user listing is ADMIN-only.
+    let params = new HttpParams();
+    if (departmentGId) {
+      params = params.set('departmentGId', departmentGId);
+    }
+    return this.http.get<PagedResult<User>>(`${this.baseUrl}/assignable`, { params });
   }
 
   approveUser(

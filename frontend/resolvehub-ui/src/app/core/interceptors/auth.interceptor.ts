@@ -20,7 +20,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !req.url.includes('/api/Auth/login')) {
+      // Only treat a 401 as "session expired" if this request actually carried the current token.
+      // This avoids a bogus toast for anonymous requests and stops parallel 401s from each
+      // logging out / toasting / navigating (after the first one, the token no longer matches).
+      if (
+        error.status === 401 &&
+        !req.url.includes('/api/Auth/login') &&
+        token &&
+        authService.token() === token
+      ) {
         authService.logout();
         toastService.error('Your session has expired. Please sign in again.');
         router.navigate(['/login']);

@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -36,6 +37,7 @@ export class TicketListComponent implements OnInit {
   readonly authService = inject(AuthService);
   readonly toastService = inject(ToastService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   // Tickets Data
   tickets: Ticket[] = [];
@@ -79,7 +81,8 @@ export class TicketListComponent implements OnInit {
     { status: 'IN_PROGRESS', label: 'In Progress', color: '#b45309' },
     { status: 'PENDING_USER', label: 'Pending User', color: '#c2410c' },
     { status: 'RESOLVED', label: 'Resolved', color: '#15803d' },
-    { status: 'CLOSED', label: 'Closed', color: '#475569' }
+    { status: 'CLOSED', label: 'Closed', color: '#475569' },
+    { status: 'REJECTED', label: 'Rejected', color: '#b91c1c' }
   ];
 
   // Role-Specific State
@@ -94,18 +97,33 @@ export class TicketListComponent implements OnInit {
       this.filters.myTicketsOnly = true;
     }
     this.loadDepartments();
-    this.loadTickets();
 
-    this.route.queryParams.subscribe(params => {
+    // Deep link: /tickets/:gId opens the ticket detail drawer directly.
+    const deepLinkGId = this.route.snapshot.paramMap.get('gId');
+    if (deepLinkGId) {
+      this.selectedTicketGId = deepLinkGId;
+    }
+
+    // Query params (e.g. from dashboard/priority pages) seed the filters; tickets are loaded once per change.
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['new'] === 'true') {
         this.showCreateModal = true;
-        this.cdr.markForCheck();
       }
       if (params['myTicketsOnly'] === 'true') {
         this.filters.myTicketsOnly = true;
         this.agentQueueTab = 'mine';
-        this.loadTickets();
       }
+      if (params['status'] || params['priority']) {
+        // An explicit filter from another page should not be narrowed further by the agent's "My Queue" default.
+        if (params['myTicketsOnly'] !== 'true' && !this.authService.isRegularUser()) {
+          this.filters.myTicketsOnly = false;
+          this.agentQueueTab = 'all';
+        }
+        this.filters.status = params['status'] || '';
+        this.filters.priority = params['priority'] || '';
+        this.filters.pageNumber = 1;
+      }
+      this.loadTickets();
     });
   }
 

@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
 import { NotificationItem, NotificationEventTypes } from '../../../models/notification.model';
 import { Subscription, interval } from 'rxjs';
@@ -24,6 +25,7 @@ import { Subscription, interval } from 'rxjs';
 export class NotificationDropdownComponent implements OnInit, OnDestroy {
   private readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef);
 
@@ -70,6 +72,9 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
   }
 
   refreshCount(): void {
+    if (!this.authService.token()) {
+      return; // Not signed in (e.g. shell rendered before redirect to /login)
+    }
     this.notificationService.refreshUnreadCount().subscribe({
       next: () => this.cdr.markForCheck(),
       error: () => {}
@@ -107,10 +112,13 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
 
     this.isOpen.set(false);
 
+    // Requesters use the user portal; staff use the operations portal.
+    const ticketBase = this.authService.isRegularUser() ? '/user/tickets' : '/tickets';
     if (item.actionUrl) {
-      this.router.navigateByUrl(item.actionUrl);
+      const url = item.actionUrl.startsWith('/tickets/') ? item.actionUrl.replace('/tickets', ticketBase) : item.actionUrl;
+      this.router.navigateByUrl(url);
     } else if (item.ticketGId) {
-      this.router.navigate(['/tickets', item.ticketGId]);
+      this.router.navigate([ticketBase, item.ticketGId]);
     }
     this.cdr.markForCheck();
   }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EMPTY, Observable, expand, reduce } from 'rxjs';
 import { Category } from '../../../models/category.model';
 import { SubCategory } from '../../../models/subcategory.model';
 import { Department } from '../../../models/department.model';
@@ -8,6 +9,7 @@ import { CategoryService } from '../../../services/category.service';
 import { SubCategoryService } from '../../../services/subcategory.service';
 import { DepartmentService } from '../../../services/department.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CategoryFormModalComponent } from '../category-form-modal/category-form-modal.component';
 import { SubCategoryFormModalComponent } from '../subcategory-form-modal/subcategory-form-modal.component';
 
@@ -28,6 +30,10 @@ export class CategoryListComponent implements OnInit {
   private readonly subCategoryService = inject(SubCategoryService);
   private readonly departmentService = inject(DepartmentService);
   private readonly toastService = inject(ToastService);
+  private readonly authService = inject(AuthService);
+
+  /** Create/edit/delete are ADMIN-only on the backend; agents get a read-only view. */
+  readonly canManage = this.authService.isAdmin();
   private readonly cdr = inject(ChangeDetectorRef);
 
   categories: Category[] = [];
@@ -107,12 +113,9 @@ export class CategoryListComponent implements OnInit {
         this.categories.forEach(c => this.expandedCategories.add(c.gId));
 
         // Load subcategories
-        this.subCategoryService.getSubCategories({
-          departmentGId: this.selectedDepartmentGId || undefined,
-          pageSize: 200
-        }).subscribe({
-          next: subRes => {
-            this.subCategories = subRes.items || [];
+        this.loadAllSubCategories(this.selectedDepartmentGId || undefined).subscribe({
+          next: subs => {
+            this.subCategories = subs;
             this.isLoading = false;
             this.cdr.markForCheck();
           },
@@ -127,6 +130,19 @@ export class CategoryListComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  /**
+   * The API caps page size at 100, so page through all subcategories rather than
+   * requesting one oversized page and silently dropping the rest.
+   */
+  private loadAllSubCategories(departmentGId?: string): Observable<SubCategory[]> {
+    const fetchPage = (pageNumber: number) =>
+      this.subCategoryService.getSubCategories({ departmentGId, pageNumber, pageSize: 100 });
+    return fetchPage(1).pipe(
+      expand(res => (res.hasNextPage ? fetchPage(res.pageNumber + 1) : EMPTY)),
+      reduce((all, res) => all.concat(res.items || []), [] as SubCategory[])
+    );
   }
 
   getSubCategoriesForCategory(categoryGId: string): SubCategory[] {

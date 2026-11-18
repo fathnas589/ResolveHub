@@ -305,9 +305,9 @@
                     <div class="comment-bubble-card" [class.is-internal]="c.isInternal">
                       <div class="comment-header">
                         <div class="comment-author-box">
-                          <span class="avatar-sm">{{ getInitials(c.userFullName) }}</span>
-                          <span class="author-name">{{ c.userFullName }}</span>
-                          <span class="role-pill" [attr.data-role]="c.userRole">{{ c.userRole }}</span>
+                          <span class="avatar-sm">{{ getInitials(c.authorFullName) }}</span>
+                          <span class="author-name">{{ c.authorFullName }}</span>
+                          <span class="role-pill" [attr.data-role]="c.authorRoleCode">{{ c.authorRoleCode }}</span>
                           @if (c.isInternal) {
                             <span class="internal-badge">&#128274; STAFF NOTE</span>
                           }
@@ -344,7 +344,7 @@
                           <span class="timeline-date">{{ item.created | date:'medium' }}</span>
                         </div>
                         <div class="timeline-performer">
-                          by <strong>{{ item.performedByFullName }}</strong> ({{ item.performedByUserName }})
+                          by <strong>{{ item.actorFullName }}</strong> ({{ item.actorUserName }})
                         </div>
                         @if (item.oldValue || item.newValue) {
                           <div class="timeline-values">
@@ -355,9 +355,9 @@
                             <span class="new-val">{{ item.newValue }}</span>
                           </div>
                         }
-                        @if (item.remarks) {
+                        @if (item.comments) {
                           <div class="timeline-remarks">
-                            <em>&ldquo;{{ item.remarks }}&rdquo;</em>
+                            <em>&ldquo;{{ item.comments }}&rdquo;</em>
                           </div>
                         }
                       </div>

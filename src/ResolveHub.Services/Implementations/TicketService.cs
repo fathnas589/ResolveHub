@@ -204,7 +204,7 @@ public class TicketService : ITicketService
 
         try
         {
-            _ = _notificationService.PublishTicketCreatedAsync(
+            await _notificationService.PublishTicketCreatedAsync(
                 companyId,
                 createdTicket.Id,
                 createdTicket.GId,
@@ -415,7 +415,7 @@ public class TicketService : ITicketService
         try
         {
             bool isReassignment = ticket.AssignedToUserId.HasValue && ticket.AssignedToUserId.Value != targetUser.Id;
-            _ = _notificationService.PublishTicketAssignedAsync(
+            await _notificationService.PublishTicketAssignedAsync(
                 companyId,
                 assigned.Id,
                 assigned.GId,
@@ -479,7 +479,7 @@ public class TicketService : ITicketService
                 _logger.LogError(ex, "Error updating SLA resolution for Ticket {TicketId}", ticket.Id);
             }
         }
-        else if (currentStatus == "RESOLVED" && newStatus == "IN_PROGRESS")
+        else if (currentStatus is "RESOLVED" or "CLOSED" or "REJECTED" && newStatus is "OPEN" or "IN_PROGRESS")
         {
             try
             {
@@ -500,7 +500,7 @@ public class TicketService : ITicketService
 
         try
         {
-            _ = _notificationService.PublishTicketStatusChangedAsync(
+            await _notificationService.PublishTicketStatusChangedAsync(
                 companyId,
                 ticket.Id,
                 ticket.GId,
@@ -597,7 +597,7 @@ public class TicketService : ITicketService
             try
             {
                 bool isAuthorStaff = role == "ADMIN" || role == "AGENT";
-                _ = _notificationService.PublishTicketCommentAddedAsync(
+                await _notificationService.PublishTicketCommentAddedAsync(
                     companyId,
                     ticket.Id,
                     ticket.GId,
@@ -623,7 +623,8 @@ public class TicketService : ITicketService
             Created = comment.Created,
             AuthorUserGId = comment.AuthorUserGId,
             AuthorUserName = comment.AuthorUserName,
-            AuthorFullName = comment.AuthorFullName
+            AuthorFullName = comment.AuthorFullName,
+            AuthorRoleCode = comment.AuthorRoleCode
         };
     }
 
@@ -651,7 +652,8 @@ public class TicketService : ITicketService
             Created = c.Created,
             AuthorUserGId = c.AuthorUserGId,
             AuthorUserName = c.AuthorUserName,
-            AuthorFullName = c.AuthorFullName
+            AuthorFullName = c.AuthorFullName,
+            AuthorRoleCode = c.AuthorRoleCode
         });
     }
 
@@ -724,12 +726,11 @@ public class TicketService : ITicketService
 
         bool isAllowed = (currentStatus, newStatus) switch
         {
-            ("OPEN", "ASSIGNED") => role is "ADMIN" or "AGENT",
+            // OPEN -> ASSIGNED is only allowed through the assign endpoint so that an assignee is always set.
             ("OPEN", "REJECTED") => role is "ADMIN" or "AGENT",
 
             ("ASSIGNED", "IN_PROGRESS") => role is "ADMIN" or "AGENT",
             ("ASSIGNED", "REJECTED") => role is "ADMIN" or "AGENT",
-            ("ASSIGNED", "ASSIGNED") => role is "ADMIN" or "AGENT",
 
             ("IN_PROGRESS", "PENDING_USER") => role is "ADMIN" or "AGENT",
             ("IN_PROGRESS", "RESOLVED") => role is "ADMIN" or "AGENT",
@@ -788,7 +789,7 @@ public class TicketService : ITicketService
             return "NO_SLA";
         }
 
-        bool isResolvedOrClosed = ticketStatus is "RESOLVED" or "CLOSED";
+        bool isResolvedOrClosed = ticketStatus is "RESOLVED" or "CLOSED" or "REJECTED";
         if (isResolvedOrClosed || sla.ResolvedAt.HasValue)
         {
             return sla.ResolutionBreached ? "COMPLETED_BREACHED" : "COMPLETED_ON_TIME";

@@ -79,8 +79,7 @@ export class DashboardComponent implements OnInit {
 
   getPriorityColor(priority: string): string {
     switch (priority?.toUpperCase()) {
-      case 'CRITICAL':
-      case 'URGENT': return '#FF5268';
+      case 'CRITICAL': return '#FF5268';
       case 'HIGH': return '#F5B942';
       case 'MEDIUM': return '#3478F6';
       case 'LOW': return '#24D6A0';
@@ -90,14 +89,13 @@ export class DashboardComponent implements OnInit {
 
   getStatusColor(status: string): string {
     switch (status?.toUpperCase()) {
-      case 'OPEN':
-      case 'NEW': return '#3478F6';
+      case 'OPEN': return '#3478F6';
       case 'ASSIGNED': return '#8955F6';
       case 'IN_PROGRESS': return '#20D6B0';
       case 'PENDING_USER': return '#F5B942';
       case 'RESOLVED': return '#24D6A0';
       case 'CLOSED': return '#7487A4';
-      case 'CANCELLED': return '#FF5268';
+      case 'REJECTED': return '#FF5268';
       default: return '#7487A4';
     }
   }
