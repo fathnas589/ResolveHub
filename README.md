@@ -76,13 +76,20 @@ Check the connection string in `src/ResolveHub.Api/appsettings.json`, then run:
 dotnet run --project src/ResolveHub.DbInitializer
 ```
 
-### 2. Start the API
+### 2. Configure the JWT signing key
+The signing key is a secret, so it is not committed. Store your own random key (32+ characters) with .NET user-secrets:
+```bash
+dotnet user-secrets set "Jwt:Key" "<your-long-random-secret>" --project src/ResolveHub.Api
+```
+For production, set the `Jwt__Key` environment variable instead. The API refuses to start without a valid key.
+
+### 3. Start the API
 ```bash
 dotnet run --project src/ResolveHub.Api --urls "http://localhost:5102"
 ```
 API documentation: `http://localhost:5102/swagger`
 
-### 3. Start the frontend
+### 4. Start the frontend
 ```bash
 cd frontend/resolvehub-ui
 npm install

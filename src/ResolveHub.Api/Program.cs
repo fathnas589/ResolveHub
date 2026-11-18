@@ -52,8 +52,17 @@ builder.Services.AddProblemDetails();
 // JWT Authentication Configuration
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "ResolveHub";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "ResolveHubClient";
-var jwtKey = builder.Configuration["Jwt:Key"]
-    ?? throw new InvalidOperationException("Jwt:Key is not configured in appsettings.json.");
+// The signing key is a secret: it is NOT stored in appsettings.json. Provide it via
+//   development:  dotnet user-secrets set "Jwt:Key" "<random 64+ char value>" --project src/ResolveHub.Api
+//   production:   environment variable Jwt__Key (or a secret store such as Azure Key Vault)
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.StartsWith("CHANGE_ME", StringComparison.Ordinal) || jwtKey.Length < 32)
+{
+    throw new InvalidOperationException(
+        "Jwt:Key is not configured. Set a random key of at least 32 characters with " +
+        "'dotnet user-secrets set \"Jwt:Key\" \"<value>\" --project src/ResolveHub.Api' (development) " +
+        "or the 'Jwt__Key' environment variable (production).");
+}
 
 builder.Services.AddAuthentication(options =>
 {
