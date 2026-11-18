@@ -27,11 +27,11 @@
 
       <!-- Breadcrumbs -->
       <nav class="breadcrumb-nav" aria-label="Breadcrumbs">
-        <span class="breadcrumb-item">{{ currentSection }}</span>
+        <span class="breadcrumb-item">{{ currentSection() }}</span>
         <svg class="breadcrumb-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 12 10 8 6 4"/>
         </svg>
-        <span class="breadcrumb-item active">{{ currentPageTitle }}</span>
+        <span class="breadcrumb-item active">{{ currentPageTitle() }}</span>
       </nav>
     </div>
 
@@ -57,10 +57,10 @@
         type="button"
         class="header-theme-toggle-btn"
         (click)="toggleTheme()"
-        [title]="currentTheme === 'dark' ? 'Switch to Executive Light theme' : 'Switch to Midnight Dark theme'"
+        [title]="currentTheme() === 'dark' ? 'Switch to Executive Light theme' : 'Switch to Midnight Dark theme'"
         aria-label="Toggle theme"
       >
-        @if (currentTheme === 'dark') {
+        @if (currentTheme() === 'dark') {
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <circle cx="10" cy="10" r="4"/>
             <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.34 4.34l1.42 1.42M14.24 14.24l1.42 1.42M4.34 15.66l1.42-1.42M14.24 5.76l1.42-1.42"/>

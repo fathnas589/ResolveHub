@@ -68,7 +68,7 @@
           <span class="kpi-label">OPEN TICKETS</span>
           <div class="kpi-mid">
             <span class="kpi-value">{{ metrics.summary.openTickets }}</span>
-            <span class="kpi-trend trend-up">&uarr; 12% <small>vs. 7d</small></span>
+            <span class="kpi-trend trend-neutral">{{ pctOfTotal(metrics.summary.openTickets) }}% <small>of total</small></span>
           </div>
         </div>
         <div class="kpi-sparkline" style="color: #3478F6;">
@@ -93,7 +93,7 @@
           <span class="kpi-label">IN PROGRESS</span>
           <div class="kpi-mid">
             <span class="kpi-value">{{ metrics.summary.inProgressTickets }}</span>
-            <span class="kpi-trend trend-up">&uarr; 17% <small>vs. 7d</small></span>
+            <span class="kpi-trend trend-neutral">{{ pctOfTotal(metrics.summary.inProgressTickets) }}% <small>of total</small></span>
           </div>
         </div>
         <div class="kpi-sparkline" style="color: #8955F6;">
@@ -118,7 +118,7 @@
           <span class="kpi-label">RESOLVED TODAY</span>
           <div class="kpi-mid">
             <span class="kpi-value">{{ metrics.summary.resolvedToday }}</span>
-            <span class="kpi-trend trend-neutral">0% <small>vs. yest</small></span>
+            <span class="kpi-trend trend-neutral"><small>since 00:00 UTC</small></span>
           </div>
         </div>
         <div class="kpi-sparkline" style="color: #24D6A0;">
@@ -144,7 +144,7 @@
           <span class="kpi-label">SLA BREACHES</span>
           <div class="kpi-mid">
             <span class="kpi-value text-rose">{{ metrics.summary.breachedTickets }}</span>
-            <span class="kpi-trend trend-down">&uarr; 32% <small>vs. 7d</small></span>
+            <span class="kpi-trend trend-down">{{ pctOfTotal(metrics.summary.breachedTickets) }}% <small>breach rate</small></span>
           </div>
         </div>
         <div class="kpi-sparkline" style="color: #FF5268;">
@@ -170,7 +170,7 @@
           <span class="kpi-label">SLA AT RISK</span>
           <div class="kpi-mid">
             <span class="kpi-value text-amber">{{ metrics.summary.warningTickets }}</span>
-            <span class="kpi-trend trend-neutral">0% <small>vs. yest</small></span>
+            <span class="kpi-trend trend-neutral"><small>due within 4h</small></span>
           </div>
         </div>
         <div class="kpi-sparkline" style="color: #F5B942;">
@@ -195,7 +195,7 @@
           <span class="kpi-label">AVG RESPONSE TIME</span>
           <div class="kpi-mid">
             <span class="kpi-value text-teal">{{ metrics.summary.avgResponseHours | number:'1.1-1' }}h</span>
-            <span class="kpi-trend trend-up">&darr; 100% <small>vs. 7d</small></span>
+            <span class="kpi-trend trend-neutral"><small>to first reply</small></span>
           </div>
         </div>
         <div class="kpi-sparkline" style="color: #20D6B0;">
@@ -269,7 +269,7 @@
           @for (s of metrics.statusBreakdown; track s.name) {
             <div class="dist-row">
               <div class="dist-labels">
-                <span class="dist-name">{{ s.name }}</span>
+                <span class="dist-name">{{ formatStatus(s.name) }}</span>
                 <span class="dist-count">{{ s.count }}</span>
               </div>
               <div class="progress-track">
@@ -371,7 +371,7 @@
                   <span class="agent-text">{{ t.assignedToName }}</span>
                 </td>
                 <td>
-                  <span class="status-badge" [attr.data-status]="t.status">{{ t.status }}</span>
+                  <span class="status-badge" [attr.data-status]="t.status">{{ formatStatus(t.status) }}</span>
                 </td>
                 <td class="time-text">
                   {{ t.created | date:'shortTime' }}

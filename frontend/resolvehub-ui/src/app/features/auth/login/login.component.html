@@ -1,26 +1,117 @@
 <div class="login-page">
-  <div class="login-wrapper">
-    <!-- Brand / Header -->
-    <div class="login-brand-header">
-      <div class="brand-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
+  <!-- ================= Showcase / Brand Panel ================= -->
+  <section class="showcase" aria-label="About ResolveHub">
+    <div class="showcase-grid" aria-hidden="true"></div>
+    <div class="orb orb-blue" aria-hidden="true"></div>
+    <div class="orb orb-violet" aria-hidden="true"></div>
+
+    <div class="showcase-inner">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">ResolveHub</span>
+          <span class="brand-sub">Enterprise Service Desk</span>
+        </div>
       </div>
-      <h1 class="brand-title">ResolveHub</h1>
-      <p class="brand-tagline">Enterprise Operations & SLA Service Desk</p>
+
+      <div class="hero">
+        <span class="eyebrow"><span class="pulse-dot"></span> SLA-driven ticket operations</span>
+        <h1 class="hero-title">Resolve every request <span class="gradient-text">before the SLA does.</span></h1>
+        <p class="hero-copy">
+          A multi-tenant help desk that routes complaints and service requests, tracks response and
+          resolution deadlines in real time, and escalates automatically before a breach.
+        </p>
+      </div>
+
+      <ul class="features">
+        <li>
+          <span class="feature-icon fi-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <div>
+            <strong>Hierarchical SLA engine</strong>
+            <span>Policies by department, category and priority, with escalation warnings and breach monitoring.</span>
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon fi-violet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </span>
+          <div>
+            <strong>Role-based portals</strong>
+            <span>Dedicated workspaces for admins, agents and requesters, secured with JWT.</span>
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon fi-teal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+          </span>
+          <div>
+            <strong>Live analytics &amp; audit</strong>
+            <span>Compliance dashboards, agent leaderboards, notifications and CSV audit export.</span>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Product preview card (illustrative) -->
+      <div class="preview" aria-hidden="true">
+        <div class="preview-head">
+          <span class="preview-id">RH-2026-000142</span>
+          <span class="chip chip-critical">CRITICAL</span>
+          <span class="chip chip-progress">IN PROGRESS</span>
+        </div>
+        <div class="preview-title">Payroll export failing for Finance team</div>
+        <div class="preview-sla">
+          <div class="sla-row">
+            <span>Resolution SLA</span>
+            <span class="sla-time">1h 42m left</span>
+          </div>
+          <div class="sla-bar"><span class="sla-fill"></span></div>
+        </div>
+        <div class="preview-foot">
+          <span class="avatar">PK</span>
+          <span class="preview-assignee">Assigned to <strong>Priya K.</strong></span>
+          <span class="preview-ring">
+            <svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="15.5"/><circle class="ring-fg" cx="18" cy="18" r="15.5"/></svg>
+            <span>94%</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="stack">
+        <span class="stack-label">Built with</span>
+        <span class="stack-chip">Angular 22</span>
+        <span class="stack-chip">.NET 10 Web API</span>
+        <span class="stack-chip">SQL Server</span>
+        <span class="stack-chip">Dapper</span>
+        <span class="stack-chip">JWT Auth</span>
+      </div>
     </div>
+  </section>
 
-    <!-- Login Card -->
-    <div class="login-card">
-      <div class="card-header-group">
-        <h2 class="card-heading">Sign in to your account</h2>
-        <p class="card-subheading">Enter your credentials to access ResolveHub</p>
+  <!-- ================= Sign-in Panel ================= -->
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="mobile-brand">
+        <div class="brand-logo sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <span class="brand-title">ResolveHub</span>
       </div>
 
-      <!-- Error Alert -->
+      <div class="card-header-group">
+        <h2 class="card-heading">Welcome back</h2>
+        <p class="card-subheading">Sign in to your workspace to continue.</p>
+      </div>
+
       @if (errorMessage) {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger" role="alert">
           <svg viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
           </svg>
@@ -28,74 +119,60 @@
         </div>
       }
 
-      <!-- Manual Login Form -->
       <form (ngSubmit)="onSubmit()" class="manual-login-form">
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label" for="login-company">Company ID</label>
-            <input
-              id="login-company"
-              type="number"
-              class="form-control"
-              [(ngModel)]="companyId"
-              name="companyId"
-              required
-            />
+            <input id="login-company" type="number" class="form-control" [(ngModel)]="companyId" name="companyId" required />
           </div>
           <div class="form-group">
-            <label class="form-label" for="login-user">Username or Email</label>
-            <input
-              id="login-user"
-              type="text"
-              class="form-control"
-              placeholder="e.g. admin or username"
-              [(ngModel)]="userNameOrEmail"
-              name="userNameOrEmail"
-              required
-            />
+            <label class="form-label" for="login-user">Username or email</label>
+            <div class="input-icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="7" r="3.25"/><path d="M3.5 17a6.5 6.5 0 0113 0"/></svg>
+              <input id="login-user" type="text" class="form-control" placeholder="you@company.com" autocomplete="username"
+                     [(ngModel)]="userNameOrEmail" name="userNameOrEmail" required />
+            </div>
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="login-pass">Password</label>
-          <input
-            id="login-pass"
-            type="password"
-            class="form-control"
-            placeholder="••••••••"
-            [(ngModel)]="password"
-            name="password"
-            required
-          />
+          <div class="input-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="9" width="12" height="8" rx="2"/><path d="M7 9V6.5a3 3 0 016 0V9"/></svg>
+            <input id="login-pass" [type]="showPassword ? 'text' : 'password'" class="form-control has-toggle" placeholder="Enter your password"
+                   autocomplete="current-password" [(ngModel)]="password" name="password" required />
+            <button type="button" class="toggle-visibility" (click)="showPassword = !showPassword"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              @if (showPassword) {
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l14 14M8.6 8.6a2 2 0 002.8 2.8M6.2 6.3C4.4 7.4 3.1 9 2.5 10c1.3 2.4 4.1 5 7.5 5 1.4 0 2.7-.4 3.8-1.1M9 5.1c.3 0 .7-.1 1-.1 3.4 0 6.2 2.6 7.5 5-.4.8-1 1.7-1.8 2.5"/></svg>
+              } @else {
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 10C3.8 7.6 6.6 5 10 5s6.2 2.6 7.5 5c-1.3 2.4-4.1 5-7.5 5s-6.2-2.6-7.5-5z"/><circle cx="10" cy="10" r="2.25"/></svg>
+              }
+            </button>
+          </div>
         </div>
 
-        <button
-          type="submit"
-          class="btn-submit"
-          [disabled]="isLoading"
-        >
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
           @if (isLoading) {
             <span class="spinner-sm"></span>
-            <span>Signing In...</span>
+            <span>Signing in…</span>
           } @else {
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 16l4-4-4-4m4 4H3"/>
-              <path d="M16 4h2a2 2 0 012 2v8a2 2 0 01-2 2h-2"/>
-            </svg>
-            <span>Sign In to ResolveHub</span>
+            <span>Sign in</span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10h12m-5-5l5 5-5 5"/></svg>
           }
         </button>
 
         <div class="register-prompt">
-          <span>New user needing assistance?</span>
-          <a routerLink="/register" class="register-link">Register Self-Service Account &rarr;</a>
+          <span>New here?</span>
+          <a routerLink="/register" class="register-link">Create a requester account</a>
         </div>
       </form>
-    </div>
 
-    <!-- Footer -->
-    <div class="login-footer">
-      <span>ResolveHub Enterprise Platform &bull; Multi-Tenant Architecture</span>
+      <div class="trust-row">
+        <span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2.5l6 2.5v4.5c0 3.8-2.6 6.6-6 8-3.4-1.4-6-4.2-6-8V5l6-2.5z"/><path d="M7.5 10l1.8 1.8L12.8 8"/></svg>JWT-secured</span>
+        <span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>Multi-tenant</span>
+        <span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3a5 5 0 00-5 5v3l-1.5 2.5h13L15 11V8a5 5 0 00-5-5zM8 16a2 2 0 004 0"/></svg>Real-time alerts</span>
+      </div>
     </div>
-  </div>
+  </section>
 </div>

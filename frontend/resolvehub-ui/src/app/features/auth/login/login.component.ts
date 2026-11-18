@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit {
   userNameOrEmail = '';
   password = '';
   isLoading = false;
+  showPassword = false;
   errorMessage: string | null = null;
 
   ngOnInit(): void {

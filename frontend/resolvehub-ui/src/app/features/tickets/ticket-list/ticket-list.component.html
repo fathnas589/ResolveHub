@@ -213,7 +213,6 @@
             <tr>
               <th class="th-code">Code</th>
               <th class="th-subject">Subject</th>
-              <th class="th-type">Type</th>
               <th class="th-dept">Department</th>
               <th class="th-status">Status</th>
               <th class="th-priority">Priority</th>
@@ -235,17 +234,15 @@
                 <td class="td-subject">
                   <div class="subject-cell">
                     <span class="subject-text" [title]="ticket.subject">{{ ticket.subject }}</span>
-                    @if (ticket.categoryName) {
-                      <span class="category-subtext">{{ ticket.categoryName }}</span>
-                    }
+                    <span class="subject-meta">
+                      <span class="badge badge-type" [attr.data-type]="ticket.ticketType">
+                        {{ ticket.ticketType === 'SERVICE_REQUEST' ? 'Request' : 'Complaint' }}
+                      </span>
+                      @if (ticket.categoryName) {
+                        <span class="category-subtext">{{ ticket.categoryName }}</span>
+                      }
+                    </span>
                   </div>
-                </td>
-
-                <!-- Type -->
-                <td class="td-type">
-                  <span class="badge badge-type" [attr.data-type]="ticket.ticketType">
-                    {{ ticket.ticketType === 'SERVICE_REQUEST' ? 'Request' : 'Complaint' }}
-                  </span>
                 </td>
 
                 <!-- Department -->
@@ -256,7 +253,7 @@
                 <!-- Status -->
                 <td class="td-status">
                   <span class="badge badge-status" [attr.data-status]="ticket.status">
-                    {{ ticket.status.replace('_', ' ') }}
+                    {{ ticket.status.replaceAll('_', ' ') }}
                   </span>
                 </td>
 
@@ -297,8 +294,8 @@
 
                 <!-- Last Updated -->
                 <td class="td-updated">
-                  <span class="date-text" [title]="ticket.lastUpd | date:'medium'">
-                    {{ ticket.lastUpd | date:'shortDate' }}
+                  <span class="date-text" [title]="(ticket.lastUpd || ticket.created) | date:'medium'">
+                    {{ (ticket.lastUpd || ticket.created) | date:'MMM d' }}
                   </span>
                 </td>
 

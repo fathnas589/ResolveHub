@@ -77,6 +77,21 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/tickets'], { queryParams: { status: 'OPEN' } });
   }
 
+  /** Share of all tickets, as a whole-number percentage (0 when there are no tickets). */
+  pctOfTotal(count: number): number {
+    const total = this.metrics?.summary.totalTickets || 0;
+    return total > 0 ? Math.round((count / total) * 100) : 0;
+  }
+
+  /** IN_PROGRESS -> In Progress */
+  formatStatus(status: string): string {
+    return (status || '')
+      .toLowerCase()
+      .split('_')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  }
+
   getPriorityColor(priority: string): string {
     switch (priority?.toUpperCase()) {
       case 'CRITICAL': return '#FF5268';

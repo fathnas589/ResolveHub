@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, NavigationEnd } from '@angular/router';
@@ -20,9 +20,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   readonly authService = inject(AuthService);
 
-  currentPageTitle = 'Service Desk';
-  currentSection = 'Operations';
-  currentTheme: 'dark' | 'light' = 'dark';
+  // Signals so updates from router events re-render under zoneless change detection.
+  readonly currentPageTitle = signal('Service Desk');
+  readonly currentSection = signal('Operations');
+  readonly currentTheme = signal<'dark' | 'light'>('dark');
   private routerSub?: Subscription;
 
   ngOnInit(): void {
@@ -37,12 +38,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   toggleTheme(): void {
-    const next = this.currentTheme === 'dark' ? 'light' : 'dark';
+    const next = this.currentTheme() === 'dark' ? 'light' : 'dark';
     this.setTheme(next);
   }
 
   setTheme(theme: 'dark' | 'light'): void {
-    this.currentTheme = theme;
+    this.currentTheme.set(theme);
     localStorage.setItem('resolvehub_theme', theme);
     if (theme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
@@ -58,32 +59,32 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private updateBreadcrumbs(url: string): void {
     const cleanUrl = url.split('?')[0];
     if (cleanUrl.includes('dashboard')) {
-      this.currentSection = 'Analytics';
-      this.currentPageTitle = 'Overview Dashboard';
+      this.currentSection.set('Analytics');
+      this.currentPageTitle.set('Overview Dashboard');
     } else if (cleanUrl.includes('tickets')) {
-      this.currentSection = this.currentRole === 'USER' ? 'Help Center' : 'Operations';
-      this.currentPageTitle = this.currentRole === 'USER' ? 'My Requests' : 'Service Desk';
+      this.currentSection.set(this.currentRole === 'USER' ? 'Help Center' : 'Operations');
+      this.currentPageTitle.set(this.currentRole === 'USER' ? 'My Requests' : 'Service Desk');
     } else if (cleanUrl.includes('departments')) {
-      this.currentSection = 'Administration';
-      this.currentPageTitle = 'Departments';
+      this.currentSection.set('Administration');
+      this.currentPageTitle.set('Departments');
     } else if (cleanUrl.includes('categories')) {
-      this.currentSection = 'Administration';
-      this.currentPageTitle = 'Categories & Taxonomies';
+      this.currentSection.set('Administration');
+      this.currentPageTitle.set('Categories & Taxonomies');
     } else if (cleanUrl.includes('priorities')) {
-      this.currentSection = 'Administration';
-      this.currentPageTitle = 'Priorities';
+      this.currentSection.set('Administration');
+      this.currentPageTitle.set('Priorities');
     } else if (cleanUrl.includes('sla-policies')) {
-      this.currentSection = 'Administration';
-      this.currentPageTitle = 'SLA Policies';
+      this.currentSection.set('Administration');
+      this.currentPageTitle.set('SLA Policies');
     } else if (cleanUrl.includes('users')) {
-      this.currentSection = 'Administration';
-      this.currentPageTitle = 'Team & Users';
+      this.currentSection.set('Administration');
+      this.currentPageTitle.set('Team & Users');
     } else if (cleanUrl.includes('reports')) {
-      this.currentSection = 'Analytics';
-      this.currentPageTitle = 'Performance Reports';
+      this.currentSection.set('Analytics');
+      this.currentPageTitle.set('Performance Reports');
     } else {
-      this.currentSection = 'Portal';
-      this.currentPageTitle = 'Service Desk';
+      this.currentSection.set('Portal');
+      this.currentPageTitle.set('Service Desk');
     }
   }
 

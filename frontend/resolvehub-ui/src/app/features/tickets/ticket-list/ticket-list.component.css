@@ -372,7 +372,7 @@
 
 .tickets-table th {
   background: var(--bg-surface-elevated);
-  padding: 0.875rem 1rem;
+  padding: 0.875rem 0.75rem;
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -383,7 +383,7 @@
 }
 
 .tickets-table td {
-  padding: 0.875rem 1rem;
+  padding: 0.875rem 0.75rem;
   font-size: 0.8125rem;
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border-subtle);
@@ -463,7 +463,7 @@
 .badge-status[data-status="PENDING_USER"] { background: rgba(245, 185, 66, 0.12); color: var(--warning); border: 1px solid rgba(245, 185, 66, 0.3); }
 .badge-status[data-status="RESOLVED"] { background: rgba(36, 214, 160, 0.12); color: var(--success); border: 1px solid rgba(36, 214, 160, 0.3); }
 .badge-status[data-status="CLOSED"] { background: rgba(116, 135, 164, 0.12); color: var(--text-muted); border: 1px solid rgba(116, 135, 164, 0.25); }
-.badge-status[data-status="CANCELLED"] { background: rgba(255, 82, 104, 0.12); color: var(--danger); border: 1px solid rgba(255, 82, 104, 0.3); }
+.badge-status[data-status="REJECTED"] { background: rgba(255, 82, 104, 0.12); color: var(--danger); border: 1px solid rgba(255, 82, 104, 0.3); }
 
 /* SLA Countdown Pill */
 .sla-pill {
@@ -612,3 +612,4 @@
   color: var(--text-primary);
   line-height: 1.35;
 }
+
