@@ -11,6 +11,7 @@ import { Department } from '../../../models/department.model';
 import { Category } from '../../../models/category.model';
 import { SubCategory } from '../../../models/subcategory.model';
 import { TicketPriority, TicketType, CreateTicketRequest } from '../../../models/ticket.model';
+import { AiService, TriageSuggestion } from '../../../services/ai.service';
 
 @Component({
   selector: 'app-user-raise-ticket',
@@ -27,6 +28,7 @@ export class UserRaiseTicketComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly aiService = inject(AiService);
 
   // Master Data
   departments: Department[] = [];
@@ -57,8 +59,96 @@ export class UserRaiseTicketComponent implements OnInit {
   isSubmitting = false;
   formErrorMessage: string | null = null;
 
+  // AI triage assistant
+  aiEnabled = false;
+  aiLoading = false;
+  aiError: string | null = null;
+  aiSuggestion: TriageSuggestion | null = null;
+  /** Fields filled by AI; a field's badge disappears once the user changes it. */
+  aiFilled = new Set<'type' | 'department' | 'category' | 'subcategory' | 'priority'>();
+
   ngOnInit(): void {
     this.loadDepartments();
+    this.aiService.enabled$.subscribe(enabled => {
+      this.aiEnabled = enabled;
+      this.cdr.markForCheck();
+    });
+  }
+
+  /** Enough text for a meaningful suggestion. */
+  get canAskAi(): boolean {
+    return (this.subject.trim().length + this.description.trim().length) >= 10 && !this.aiLoading && !this.isSubmitting;
+  }
+
+  requestAiSuggestion(): void {
+    if (!this.canAskAi) return;
+    this.aiLoading = true;
+    this.aiError = null;
+    this.cdr.markForCheck();
+
+    this.aiService.suggestTriage(this.subject.trim(), this.description.trim()).subscribe({
+      next: suggestion => {
+        this.aiLoading = false;
+        this.applySuggestion(suggestion);
+      },
+      error: err => {
+        this.aiLoading = false;
+        this.aiError = err.error?.message || 'AI suggestion is unavailable right now. Please fill the form manually.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private applySuggestion(s: TriageSuggestion): void {
+    this.aiSuggestion = s;
+    this.ticketType = s.ticketType;
+    this.priority = s.priority;
+    this.aiFilled = new Set(['type', 'priority', 'department', 'category']);
+    if (s.subCategoryGId) this.aiFilled.add('subcategory');
+
+    // Cascade: department -> categories -> category -> subcategories -> subcategory
+    this.departmentGId = s.departmentGId;
+    this.categoryGId = '';
+    this.subCategoryGId = '';
+    this.subCategories = [];
+    this.isLoadingCategories = true;
+    this.cdr.markForCheck();
+
+    this.catService.getCategories({ departmentGId: s.departmentGId, isActive: true, pageNumber: 1, pageSize: 100 }).subscribe({
+      next: res => {
+        this.categories = (res.items || []).filter(c => c.isActive);
+        this.isLoadingCategories = false;
+        this.categoryGId = s.categoryGId;
+        this.isLoadingSubCategories = true;
+        this.cdr.markForCheck();
+
+        this.subCatService.getSubCategories({ categoryGId: s.categoryGId, isActive: true, pageNumber: 1, pageSize: 100 }).subscribe({
+          next: subRes => {
+            this.subCategories = (subRes.items || []).filter(sc => sc.isActive);
+            this.subCategoryGId = s.subCategoryGId && this.subCategories.some(sc => sc.gId === s.subCategoryGId) ? s.subCategoryGId : '';
+            this.isLoadingSubCategories = false;
+            this.cdr.markForCheck();
+          },
+          error: () => { this.isLoadingSubCategories = false; this.cdr.markForCheck(); }
+        });
+      },
+      error: () => { this.isLoadingCategories = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  dismissAiSuggestion(): void {
+    this.aiSuggestion = null;
+    this.aiFilled.clear();
+    this.cdr.markForCheck();
+  }
+
+  /** Called when the user edits a field the AI filled. */
+  clearAiMark(field: 'type' | 'department' | 'category' | 'subcategory' | 'priority'): void {
+    this.aiFilled.delete(field);
+  }
+
+  formatPriority(p: string): string {
+    return p.charAt(0) + p.slice(1).toLowerCase();
   }
 
   loadDepartments(): void {
@@ -80,6 +170,9 @@ export class UserRaiseTicketComponent implements OnInit {
   }
 
   onDepartmentChange(): void {
+    this.clearAiMark('department');
+    this.clearAiMark('category');
+    this.clearAiMark('subcategory');
     this.categoryGId = '';
     this.subCategoryGId = '';
     this.categories = [];
@@ -109,6 +202,8 @@ export class UserRaiseTicketComponent implements OnInit {
   }
 
   onCategoryChange(): void {
+    this.clearAiMark('category');
+    this.clearAiMark('subcategory');
     this.subCategoryGId = '';
     this.subCategories = [];
 

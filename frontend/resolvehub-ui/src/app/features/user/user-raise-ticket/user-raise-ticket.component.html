@@ -13,7 +13,9 @@
     <div class="form-header">
       <span class="form-badge">New Request</span>
       <h1 class="form-title">Submit a Service Request or Issue</h1>
-      <p class="form-subtitle">Fill in the details below. Your ticket will automatically match the active SLA policy and route to the responsible support team.</p>
+      <p class="form-subtitle">
+        Describe what you need — {{ aiEnabled ? 'AI can fill in the routing details for you.' : 'your ticket is matched to the right SLA and team automatically.' }}
+      </p>
     </div>
 
     <!-- Error Banner -->
@@ -28,17 +30,108 @@
     }
 
     <form (ngSubmit)="onSubmit()" class="raise-ticket-form">
-      <!-- 1. Request Type Selector -->
+      <!-- 1. Subject -->
       <div class="form-group">
-        <label class="field-label">Request Type <span class="required">*</span></label>
-        <div class="type-selector-grid">
+        <label class="field-label" for="ticketSubject">
+          Subject / Brief Summary <span class="required">*</span>
+        </label>
+        <input
+          id="ticketSubject"
+          type="text"
+          name="subject"
+          class="form-input"
+          placeholder="e.g. Laptop won't turn on, need VPN access, salary missing overtime..."
+          [(ngModel)]="subject"
+          [disabled]="isSubmitting"
+          maxlength="200"
+          required
+        />
+        <div class="char-count">{{ subject.length }}/200</div>
+      </div>
+
+      <!-- 2. Description -->
+      <div class="form-group">
+        <label class="field-label" for="ticketDescription">
+          Detailed Description <span class="required">*</span>
+        </label>
+        <textarea
+          id="ticketDescription"
+          name="description"
+          rows="4"
+          class="form-textarea"
+          placeholder="What happened? Include error messages, deadlines, and who is affected..."
+          [(ngModel)]="description"
+          [disabled]="isSubmitting"
+          required
+        ></textarea>
+        <div class="char-count">
+          @if (description && description.trim().length < 3) {
+            <span style="color: #f59e0b; margin-right: 0.5rem;">Minimum 3 characters required</span>
+          }
+          {{ description.length }} characters
+        </div>
+      </div>
+
+      <!-- AI Assist Panel -->
+      @if (aiEnabled) {
+        <div class="ai-panel" [class.ai-panel-loading]="aiLoading" [class.ai-panel-done]="aiSuggestion && !aiLoading">
+          @if (aiLoading) {
+            <div class="ai-row">
+              <span class="ai-orb"><span class="ai-spark">✨</span></span>
+              <div class="ai-copy">
+                <strong>Analysing your request…</strong>
+                <span>Matching it against your company's categories and SLA priorities</span>
+              </div>
+            </div>
+            <div class="ai-shimmer"><span></span><span></span><span></span></div>
+          } @else if (aiSuggestion) {
+            <div class="ai-row">
+              <span class="ai-orb ai-orb-done">✓</span>
+              <div class="ai-copy">
+                <strong>AI filled in the details — review and adjust if needed</strong>
+                <span class="ai-reason">“{{ aiSuggestion.reason }}”</span>
+              </div>
+              <button type="button" class="ai-link" (click)="requestAiSuggestion()" [disabled]="!canAskAi">Re-run</button>
+              <button type="button" class="ai-link" (click)="dismissAiSuggestion()">Dismiss</button>
+            </div>
+            <div class="ai-chips">
+              <span class="ai-chip">{{ aiSuggestion.departmentName }}</span>
+              <span class="ai-chip-sep">›</span>
+              <span class="ai-chip">{{ aiSuggestion.categoryName }}</span>
+              @if (aiSuggestion.subCategoryName) {
+                <span class="ai-chip-sep">›</span>
+                <span class="ai-chip">{{ aiSuggestion.subCategoryName }}</span>
+              }
+              <span class="ai-chip ai-chip-priority" [attr.data-priority]="aiSuggestion.priority">{{ formatPriority(aiSuggestion.priority) }} priority</span>
+              <span class="ai-chip">{{ aiSuggestion.ticketType === 'COMPLAINT' ? 'Complaint' : 'Service Request' }}</span>
+            </div>
+          } @else {
+            <div class="ai-row">
+              <span class="ai-orb"><span class="ai-spark">✨</span></span>
+              <div class="ai-copy">
+                <strong>Let AI route this for you</strong>
+                <span>{{ canAskAi ? 'Suggests the department, category, priority and type from your description.' : 'Type a short subject or description first.' }}</span>
+              </div>
+              <button type="button" class="btn-ai" (click)="requestAiSuggestion()" [disabled]="!canAskAi" id="btn-ai-suggest">
+                <span>✨</span> Suggest with AI
+              </button>
+            </div>
+          }
+          @if (aiError) {
+            <div class="ai-error">{{ aiError }}</div>
+          }
+        </div>
+      }
+
+      <!-- 3. Request Type Selector -->
+      <div class="form-group">
+        <label class="field-label">
+          Request Type <span class="required">*</span>
+          @if (aiFilled.has('type')) { <span class="ai-badge">✨ AI</span> }
+        </label>
+        <div class="type-selector-grid" [class.ai-filled]="aiFilled.has('type')">
           <label class="type-card" [class.selected]="ticketType === 'SERVICE_REQUEST'">
-            <input
-              type="radio"
-              name="ticketType"
-              value="SERVICE_REQUEST"
-              [(ngModel)]="ticketType"
-            />
+            <input type="radio" name="ticketType" value="SERVICE_REQUEST" [(ngModel)]="ticketType" (change)="clearAiMark('type')" />
             <div class="type-icon-box">🛠️</div>
             <div class="type-info">
               <span class="type-title">Service Request</span>
@@ -47,12 +140,7 @@
           </label>
 
           <label class="type-card" [class.selected]="ticketType === 'COMPLAINT'">
-            <input
-              type="radio"
-              name="ticketType"
-              value="COMPLAINT"
-              [(ngModel)]="ticketType"
-            />
+            <input type="radio" name="ticketType" value="COMPLAINT" [(ngModel)]="ticketType" (change)="clearAiMark('type')" />
             <div class="type-icon-box">🚨</div>
             <div class="type-info">
               <span class="type-title">Complaint / Issue</span>
@@ -62,14 +150,18 @@
         </div>
       </div>
 
-      <!-- 2. Department & Category Cascade -->
+      <!-- 4. Department & Category Cascade -->
       <div class="form-row-2">
         <div class="form-group">
-          <label class="field-label" for="departmentSelect">Department <span class="required">*</span></label>
+          <label class="field-label" for="departmentSelect">
+            Department <span class="required">*</span>
+            @if (aiFilled.has('department')) { <span class="ai-badge">✨ AI</span> }
+          </label>
           <select
             id="departmentSelect"
             name="departmentGId"
             class="form-select"
+            [class.ai-filled]="aiFilled.has('department')"
             [(ngModel)]="departmentGId"
             (change)="onDepartmentChange()"
             [disabled]="isLoadingDepartments || isSubmitting"
@@ -86,11 +178,15 @@
         </div>
 
         <div class="form-group">
-          <label class="field-label" for="categorySelect">Category <span class="required">*</span></label>
+          <label class="field-label" for="categorySelect">
+            Category <span class="required">*</span>
+            @if (aiFilled.has('category')) { <span class="ai-badge">✨ AI</span> }
+          </label>
           <select
             id="categorySelect"
             name="categoryGId"
             class="form-select"
+            [class.ai-filled]="aiFilled.has('category')"
             [(ngModel)]="categoryGId"
             (change)="onCategoryChange()"
             [disabled]="!departmentGId || isLoadingCategories || isSubmitting"
@@ -106,17 +202,20 @@
         </div>
       </div>
 
-      <!-- 3. SubCategory (optional) & Priority -->
+      <!-- 5. SubCategory (optional) & Priority -->
       <div class="form-row-2">
         <div class="form-group">
           <label class="field-label" for="subCategorySelect">
             SubCategory <span class="optional-text">(Optional)</span>
+            @if (aiFilled.has('subcategory')) { <span class="ai-badge">✨ AI</span> }
           </label>
           <select
             id="subCategorySelect"
             name="subCategoryGId"
             class="form-select"
+            [class.ai-filled]="aiFilled.has('subcategory')"
             [(ngModel)]="subCategoryGId"
+            (change)="clearAiMark('subcategory')"
             [disabled]="!categoryGId || isLoadingSubCategories || subCategories.length === 0 || isSubmitting"
           >
             <option value="">
@@ -129,12 +228,17 @@
         </div>
 
         <div class="form-group">
-          <label class="field-label" for="prioritySelect">Priority <span class="required">*</span></label>
+          <label class="field-label" for="prioritySelect">
+            Priority <span class="required">*</span>
+            @if (aiFilled.has('priority')) { <span class="ai-badge">✨ AI</span> }
+          </label>
           <select
             id="prioritySelect"
             name="priority"
             class="form-select"
+            [class.ai-filled]="aiFilled.has('priority')"
             [(ngModel)]="priority"
+            (change)="clearAiMark('priority')"
             [disabled]="isSubmitting"
             required
           >
@@ -145,57 +249,10 @@
         </div>
       </div>
 
-      <!-- 4. Subject -->
-      <div class="form-group">
-        <label class="field-label" for="ticketSubject">
-          Subject / Brief Summary <span class="required">*</span>
-        </label>
-        <input
-          id="ticketSubject"
-          type="text"
-          name="subject"
-          class="form-input"
-          placeholder="e.g. Laptop display flickering, need VPN configuration, payroll discrepancy..."
-          [(ngModel)]="subject"
-          [disabled]="isSubmitting"
-          maxlength="200"
-          required
-        />
-        <div class="char-count">{{ subject.length }}/200</div>
-      </div>
-
-      <!-- 5. Description -->
-      <div class="form-group">
-        <label class="field-label" for="ticketDescription">
-          Detailed Description <span class="required">*</span>
-        </label>
-        <textarea
-          id="ticketDescription"
-          name="description"
-          rows="5"
-          class="form-textarea"
-          placeholder="Please describe what happened, steps to reproduce, error messages, or specific assistance required..."
-          [(ngModel)]="description"
-          [disabled]="isSubmitting"
-          required
-        ></textarea>
-        <div class="char-count">
-          @if (description && description.trim().length < 3) {
-            <span style="color: #f59e0b; margin-right: 0.5rem;">Minimum 3 characters required</span>
-          }
-          {{ description.length }} characters
-        </div>
-      </div>
-
       <!-- Actions -->
       <div class="form-actions">
         <a routerLink="/user/dashboard" class="btn btn-outline" [class.disabled]="isSubmitting">Cancel</a>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          id="btn-submit-ticket"
-          [disabled]="isSubmitting"
-        >
+        <button type="submit" class="btn btn-primary" id="btn-submit-ticket" [disabled]="isSubmitting">
           @if (isSubmitting) {
             <span class="spinner-sm"></span>
             <span>Submitting Request...</span>

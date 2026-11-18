@@ -58,7 +58,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private updateBreadcrumbs(url: string): void {
     const cleanUrl = url.split('?')[0];
-    if (cleanUrl.includes('dashboard')) {
+    if (cleanUrl.includes('raise-ticket')) {
+      this.currentSection.set('Help Center');
+      this.currentPageTitle.set('Raise Request');
+    } else if (cleanUrl.includes('user/profile')) {
+      this.currentSection.set('Account');
+      this.currentPageTitle.set('My Profile');
+    } else if (cleanUrl.includes('dashboard')) {
       this.currentSection.set('Analytics');
       this.currentPageTitle.set('Overview Dashboard');
     } else if (cleanUrl.includes('tickets')) {

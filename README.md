@@ -22,6 +22,11 @@ ResolveHub is a full-stack service desk platform that helps organisations manage
 - Replies, activity timeline and audit history on every ticket
 - Search, filtering and pagination
 
+**✨ AI-assisted triage (Claude)**
+- Employees describe their issue and click **Suggest with AI** — Claude picks the department, category, subcategory, priority and request type
+- Suggestions are constrained to the company's real categories via a JSON schema, and every AI-filled field is badged so the user can review and change it
+- Optional: the feature hides itself when no API key is configured
+
 **SLA engine**
 - SLA policies matched by department, category, priority and ticket type, with a company-wide default
 - Automatic first-response and resolution deadlines, escalation warnings before a breach
@@ -82,6 +87,11 @@ The signing key is a secret, so it is not committed. Store your own random key (
 dotnet user-secrets set "Jwt:Key" "<your-long-random-secret>" --project src/ResolveHub.Api
 ```
 For production, set the `Jwt__Key` environment variable instead. The API refuses to start without a valid key.
+
+**Optional — enable AI triage** with an [Anthropic API key](https://console.anthropic.com/):
+```bash
+dotnet user-secrets set "Ai:ApiKey" "<your-anthropic-api-key>" --project src/ResolveHub.Api
+```
 
 ### 3. Start the API
 ```bash

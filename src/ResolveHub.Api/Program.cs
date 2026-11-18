@@ -140,6 +140,17 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<ISlaPolicyService, SlaPolicyService>();
 
+// AI triage (Claude). Optional: enabled only when an API key is configured via
+//   dotnet user-secrets set "Ai:ApiKey" "<key>" --project src/ResolveHub.Api   (or the ANTHROPIC_API_KEY env var)
+var aiApiKey = builder.Configuration["Ai:ApiKey"];
+var aiModel = builder.Configuration["Ai:Model"] ?? "claude-opus-5-5";
+Anthropic.AnthropicClient? anthropicClient =
+    !string.IsNullOrWhiteSpace(aiApiKey) ? new Anthropic.AnthropicClient { ApiKey = aiApiKey } :
+    !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")) ? new Anthropic.AnthropicClient() :
+    null;
+builder.Services.AddSingleton(new AiClientHolder(anthropicClient, aiModel));
+builder.Services.AddScoped<IAiTriageService, AiTriageService>();
+
 // Register Notification & Email options and services
 builder.Services.Configure<ResolveHub.Services.Email.EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.Configure<ResolveHub.Services.Notifications.NotificationDeliveryOptions>(builder.Configuration.GetSection("NotificationDelivery"));
