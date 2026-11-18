@@ -3,15 +3,15 @@ namespace ResolveHub.Api.Controllers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Anthropic.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ResolveHub.Core.DTOs.Ai;
+using ResolveHub.Services.Ai;
 using ResolveHub.Services.Interfaces;
 
-/// <summary>AI assistance endpoints (Claude). All suggestions are advisory — users confirm before submitting.</summary>
+/// <summary>AI assistance endpoints (Gemini or Claude, see Ai:Provider). All suggestions are advisory — users confirm before submitting.</summary>
 [ApiController]
 [Route("api/ai")]
 [Authorize]
@@ -55,13 +55,19 @@ public class AiController : ControllerBase
         {
             return UnprocessableEntity(new { message = ex.Message });
         }
-        catch (AnthropicRateLimitException)
+        catch (AiProviderException ex) when (ex.Kind == AiFailureKind.RateLimited)
         {
-            return StatusCode(StatusCodes.Status429TooManyRequests, new { message = "AI is busy right now. Please try again in a moment." });
+            _logger.LogWarning(ex, "AI provider rate limit during triage suggestion");
+            return StatusCode(StatusCodes.Status429TooManyRequests, new { message = "AI is busy right now. Please try again in a minute." });
         }
-        catch (AnthropicApiException ex)
+        catch (AiProviderException ex) when (ex.Kind == AiFailureKind.Declined)
         {
-            _logger.LogError(ex, "Claude API error during triage suggestion");
+            _logger.LogWarning(ex, "AI provider declined triage suggestion");
+            return UnprocessableEntity(new { message = "AI couldn't suggest a category for this request. Please choose manually." });
+        }
+        catch (AiProviderException ex)
+        {
+            _logger.LogError(ex, "AI provider error during triage suggestion");
             return StatusCode(StatusCodes.Status502BadGateway, new { message = "AI suggestion is unavailable right now. Please fill the form manually." });
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

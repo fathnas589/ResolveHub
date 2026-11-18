@@ -7,33 +7,26 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Anthropic;
-using Anthropic.Models.Beta;
-using Anthropic.Models.Beta.Messages;
 using Microsoft.Extensions.Logging;
 using ResolveHub.Core.DTOs.Ai;
 using ResolveHub.Core.DTOs.Categories;
 using ResolveHub.Core.DTOs.SubCategories;
 using ResolveHub.Core.Entities;
 using ResolveHub.Core.Interfaces.Repositories;
+using ResolveHub.Services.Ai;
 using ResolveHub.Services.Interfaces;
 
-/// <summary>Holds the shared Anthropic client (null when no API key is configured).</summary>
-public sealed class AiClientHolder
+/// <summary>Holds the configured AI model client (null when no provider/key is configured).</summary>
+public sealed class AiModelHolder
 {
-    public AiClientHolder(AnthropicClient? client, string model)
-    {
-        Client = client;
-        Model = model;
-    }
-
-    public AnthropicClient? Client { get; }
-    public string Model { get; }
+    public AiModelHolder(ITriageModelClient? client) => Client = client;
+    public ITriageModelClient? Client { get; }
 }
 
 /// <summary>
-/// Suggests routing for a new ticket using Claude. The model only chooses from the company's real,
-/// active categories (passed as an enum in the JSON schema), so every suggestion maps to a valid id.
+/// Suggests routing for a new ticket. The model only chooses from the company's real, active
+/// categories (passed as enums in the JSON schema), so every suggestion maps to a valid id.
+/// Works with any <see cref="ITriageModelClient"/> (Gemini free tier or Claude).
 /// </summary>
 public class AiTriageService : IAiTriageService
 {
@@ -58,13 +51,13 @@ public class AiTriageService : IAiTriageService
         "reason" is one short, friendly sentence (max 20 words) explaining your choice to the employee.
         """;
 
-    private readonly AiClientHolder _ai;
+    private readonly AiModelHolder _ai;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ISubCategoryRepository _subCategoryRepository;
     private readonly ILogger<AiTriageService> _logger;
 
     public AiTriageService(
-        AiClientHolder ai,
+        AiModelHolder ai,
         ICategoryRepository categoryRepository,
         ISubCategoryRepository subCategoryRepository,
         ILogger<AiTriageService> logger)
@@ -79,10 +72,7 @@ public class AiTriageService : IAiTriageService
 
     public async Task<TriageSuggestionDto> SuggestAsync(int companyId, TriageSuggestionRequestDto request, CancellationToken cancellationToken = default)
     {
-        if (_ai.Client is null)
-        {
-            throw new InvalidOperationException("AI suggestions are not configured.");
-        }
+        var model = _ai.Client ?? throw new InvalidOperationException("AI suggestions are not configured.");
 
         string subject = request.Subject?.Trim() ?? string.Empty;
         string description = request.Description?.Trim() ?? string.Empty;
@@ -119,20 +109,20 @@ public class AiTriageService : IAiTriageService
             }
         }
 
-        // 2. Ask Claude, constraining the output to valid keys with a JSON schema.
-        var schema = new Dictionary<string, JsonElement>
+        // 2. Ask the model, constraining the output to valid keys with a JSON schema.
+        var schema = new Dictionary<string, object>
         {
-            ["type"] = JsonSerializer.SerializeToElement("object"),
-            ["properties"] = JsonSerializer.SerializeToElement(new Dictionary<string, object>
+            ["type"] = "object",
+            ["properties"] = new Dictionary<string, object>
             {
                 ["categoryKey"] = new { type = "string", @enum = categoryByKey.Keys.ToArray() },
                 ["subCategoryKey"] = new { type = "string", @enum = new[] { "none" }.Concat(subByKey.Keys).ToArray() },
                 ["priority"] = new { type = "string", @enum = Priorities },
                 ["ticketType"] = new { type = "string", @enum = TicketTypes },
                 ["reason"] = new { type = "string" },
-            }),
-            ["required"] = JsonSerializer.SerializeToElement(new[] { "categoryKey", "subCategoryKey", "priority", "ticketType", "reason" }),
-            ["additionalProperties"] = JsonSerializer.SerializeToElement(false),
+            },
+            ["required"] = new[] { "categoryKey", "subCategoryKey", "priority", "ticketType", "reason" },
+            ["additionalProperties"] = false,
         };
 
         string userContent =
@@ -147,50 +137,36 @@ public class AiTriageService : IAiTriageService
             </ticket>
             """;
 
-        BetaMessage response = await _ai.Client.Beta.Messages.Create(new MessageCreateParams
-        {
-            Model = _ai.Model,
-            MaxTokens = 2048,
-            System = SystemPrompt,
-            Messages = [new BetaUserMessageParam { Content = userContent }],
-            OutputConfig = new BetaOutputConfig
-            {
-                Effort = Effort.Low, // simple classification - low effort keeps it fast
-                Format = new BetaJsonOutputFormat { Schema = schema },
-            },
-            // Server-side fallback: if the request is declined by a safety classifier, it is re-served by a fallback model.
-            Betas = [AnthropicBeta.ServerSideFallback2026_07_01],
-            Fallbacks = new Default(),
-        }, cancellationToken);
-
-        if (response.StopReason == "refusal")
-        {
-            throw new InvalidOperationException("AI could not suggest a category for this request.");
-        }
-
-        string? json = response.Content.Select(b => b.Value).OfType<BetaTextBlock>().FirstOrDefault()?.Text;
+        string json = await model.GenerateJsonAsync(SystemPrompt, userContent, schema, cancellationToken);
         if (string.IsNullOrWhiteSpace(json))
         {
-            throw new InvalidOperationException("AI returned an empty suggestion.");
+            throw new AiProviderException(AiFailureKind.Unavailable, "AI returned an empty suggestion.");
         }
 
-        // 3. Map keys back to real catalog entries.
-        using var doc = JsonDocument.Parse(json);
-        var root = doc.RootElement;
-        string categoryKey = root.GetProperty("categoryKey").GetString() ?? string.Empty;
-        string subKey = root.GetProperty("subCategoryKey").GetString() ?? "none";
+        // 3. Map keys back to real catalog entries (defensively - never trust model output blindly).
+        JsonElement root;
+        try
+        {
+            root = JsonDocument.Parse(json).RootElement;
+        }
+        catch (JsonException ex)
+        {
+            throw new AiProviderException(AiFailureKind.Unavailable, "AI returned invalid JSON.", ex);
+        }
 
+        string categoryKey = GetString(root, "categoryKey");
         if (!categoryByKey.TryGetValue(categoryKey, out var category))
         {
-            throw new InvalidOperationException("AI returned an unknown category.");
+            throw new AiProviderException(AiFailureKind.Unavailable, "AI returned an unknown category.");
         }
 
+        string subKey = GetString(root, "subCategoryKey");
         SubCategory? subCategory = subByKey.TryGetValue(subKey, out var s) && s.CategoryGId == category.GId ? s : null;
-        string priority = root.GetProperty("priority").GetString() ?? "MEDIUM";
-        string ticketType = root.GetProperty("ticketType").GetString() ?? "SERVICE_REQUEST";
+        string priority = GetString(root, "priority");
+        string ticketType = GetString(root, "ticketType");
 
-        _logger.LogInformation("AI triage suggested {Category} / {SubCategory} / {Priority} for company {CompanyId}",
-            category.CategoryName, subCategory?.SubCategoryName ?? "-", priority, companyId);
+        _logger.LogInformation("AI triage via {Model} suggested {Category} / {SubCategory} / {Priority} for company {CompanyId}",
+            model.Name, category.CategoryName, subCategory?.SubCategoryName ?? "-", priority, companyId);
 
         return new TriageSuggestionDto
         {
@@ -202,13 +178,18 @@ public class AiTriageService : IAiTriageService
             SubCategoryName = subCategory?.SubCategoryName,
             Priority = Priorities.Contains(priority) ? priority : "MEDIUM",
             TicketType = TicketTypes.Contains(ticketType) ? ticketType : "SERVICE_REQUEST",
-            Reason = root.TryGetProperty("reason", out var r) ? r.GetString() ?? string.Empty : string.Empty,
+            Reason = GetString(root, "reason"),
         };
     }
 
-    private async Task<List<ResolveHub.Core.Entities.Category>> LoadAllCategoriesAsync(int companyId)
+    private static string GetString(JsonElement root, string name) =>
+        root.ValueKind == JsonValueKind.Object && root.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String
+            ? v.GetString() ?? string.Empty
+            : string.Empty;
+
+    private async Task<List<Category>> LoadAllCategoriesAsync(int companyId)
     {
-        var all = new List<ResolveHub.Core.Entities.Category>();
+        var all = new List<Category>();
         for (int page = 1; ; page++)
         {
             var result = await _categoryRepository.GetListingAsync(companyId, new CategoryListRequestDto { IsActive = true, PageNumber = page, PageSize = 100 });

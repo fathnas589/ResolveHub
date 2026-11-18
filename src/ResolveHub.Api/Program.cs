@@ -140,15 +140,37 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<ISlaPolicyService, SlaPolicyService>();
 
-// AI triage (Claude). Optional: enabled only when an API key is configured via
-//   dotnet user-secrets set "Ai:ApiKey" "<key>" --project src/ResolveHub.Api   (or the ANTHROPIC_API_KEY env var)
-var aiApiKey = builder.Configuration["Ai:ApiKey"];
-var aiModel = builder.Configuration["Ai:Model"] ?? "claude-opus-5-5";
-Anthropic.AnthropicClient? anthropicClient =
-    !string.IsNullOrWhiteSpace(aiApiKey) ? new Anthropic.AnthropicClient { ApiKey = aiApiKey } :
-    !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")) ? new Anthropic.AnthropicClient() :
-    null;
-builder.Services.AddSingleton(new AiClientHolder(anthropicClient, aiModel));
+// AI triage (optional). Pick a provider with Ai:Provider = "Gemini" (free tier) or "Claude".
+//   Gemini:  dotnet user-secrets set "Ai:Gemini:ApiKey" "<key>" --project src/ResolveHub.Api   (or GEMINI_API_KEY)
+//   Claude:  dotnet user-secrets set "Ai:Claude:ApiKey" "<key>" --project src/ResolveHub.Api   (or ANTHROPIC_API_KEY)
+// With no key for the selected provider, AI features are hidden.
+var aiProvider = builder.Configuration["Ai:Provider"] ?? "Gemini";
+builder.Services.AddHttpClient("gemini", c => c.Timeout = TimeSpan.FromSeconds(30));
+builder.Services.AddSingleton(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    ResolveHub.Services.Ai.ITriageModelClient? client = null;
+
+    if (aiProvider.Equals("Claude", StringComparison.OrdinalIgnoreCase))
+    {
+        var key = config["Ai:Claude:ApiKey"];
+        var model = config["Ai:Claude:Model"] ?? "claude-opus-5-5";
+        if (!string.IsNullOrWhiteSpace(key))
+            client = new ResolveHub.Services.Ai.ClaudeTriageClient(new Anthropic.AnthropicClient { ApiKey = key }, model);
+        else if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")))
+            client = new ResolveHub.Services.Ai.ClaudeTriageClient(new Anthropic.AnthropicClient(), model);
+    }
+    else
+    {
+        var key = config["Ai:Gemini:ApiKey"];
+        if (string.IsNullOrWhiteSpace(key)) key = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+        var model = config["Ai:Gemini:Model"] ?? "gemini-3.5-flash-lite";
+        if (!string.IsNullOrWhiteSpace(key))
+            client = new ResolveHub.Services.Ai.GeminiTriageClient(sp.GetRequiredService<IHttpClientFactory>().CreateClient("gemini"), key, model);
+    }
+
+    return new AiModelHolder(client);
+});
 builder.Services.AddScoped<IAiTriageService, AiTriageService>();
 
 // Register Notification & Email options and services

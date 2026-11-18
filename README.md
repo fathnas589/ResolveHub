@@ -22,9 +22,10 @@ ResolveHub is a full-stack service desk platform that helps organisations manage
 - Replies, activity timeline and audit history on every ticket
 - Search, filtering and pagination
 
-**✨ AI-assisted triage (Claude)**
-- Employees describe their issue and click **Suggest with AI** — Claude picks the department, category, subcategory, priority and request type
+**✨ AI-assisted triage (Google Gemini or Claude)**
+- Employees describe their issue and click **Suggest with AI** — the model picks the department, category, subcategory, priority and request type
 - Suggestions are constrained to the company's real categories via a JSON schema, and every AI-filled field is badged so the user can review and change it
+- Pluggable provider: Google Gemini (free tier, default) or Anthropic Claude, switched with one setting
 - Optional: the feature hides itself when no API key is configured
 
 **SLA engine**
@@ -88,10 +89,11 @@ dotnet user-secrets set "Jwt:Key" "<your-long-random-secret>" --project src/Reso
 ```
 For production, set the `Jwt__Key` environment variable instead. The API refuses to start without a valid key.
 
-**Optional — enable AI triage** with an [Anthropic API key](https://console.anthropic.com/):
+**Optional — enable AI triage** with a free [Google AI Studio API key](https://aistudio.google.com/apikey):
 ```bash
-dotnet user-secrets set "Ai:ApiKey" "<your-anthropic-api-key>" --project src/ResolveHub.Api
+dotnet user-secrets set "Ai:Gemini:ApiKey" "<your-gemini-api-key>" --project src/ResolveHub.Api
 ```
+To use Claude instead, set `"Ai": { "Provider": "Claude" }` in `appsettings.json` and store `Ai:Claude:ApiKey`.
 
 ### 3. Start the API
 ```bash
