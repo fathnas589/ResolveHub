@@ -341,7 +341,7 @@
 }
 
 .subject-cell {
-  max-width: 340px;
+  max-width: 220px;
 }
 
 .subject-title {
@@ -706,3 +706,8 @@
     justify-content: center;
   }
 }
+
+/* Department on one line, category beneath it, to keep the table within the card */
+.dept-cat-cell { white-space: normal; }
+.dept-cat-cell .dept-text { display: block; }
+.dept-cat-cell .cat-text { display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }

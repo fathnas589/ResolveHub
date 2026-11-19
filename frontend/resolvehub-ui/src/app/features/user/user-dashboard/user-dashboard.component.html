@@ -194,7 +194,7 @@
                   </td>
                   <td class="subject-cell">
                     <span class="subject-text" [title]="ticket.subject">{{ ticket.subject }}</span>
-                    <span class="type-pill" [attr.data-type]="ticket.ticketType">{{ ticket.ticketType }}</span>
+                    <span class="type-pill" [attr.data-type]="ticket.ticketType">{{ ticket.ticketType === 'SERVICE_REQUEST' ? 'Request' : 'Complaint' }}</span>
                   </td>
                   <td class="cat-cell">
                     <div class="cat-wrapper">
@@ -204,7 +204,7 @@
                   <td>
                     <span class="status-badge" [ngClass]="getStatusBadgeClass(ticket.status)">
                       <span class="status-dot"></span>
-                      {{ ticket.status }}
+                      {{ ticket.status.replaceAll('_', ' ') }}
                     </span>
                   </td>
                   <td>

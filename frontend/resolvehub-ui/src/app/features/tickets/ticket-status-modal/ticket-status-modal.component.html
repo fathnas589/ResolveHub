@@ -18,7 +18,7 @@
       <div class="status-summary-box">
         <div class="summary-line">
           <span class="summary-label">Current Status:</span>
-          <span class="status-badge" [attr.data-status]="ticket.status">{{ ticket.status }}</span>
+          <span class="status-badge" [attr.data-status]="ticket.status">{{ ticket.status.replaceAll('_', ' ') }}</span>
         </div>
         <div class="summary-line">
           <span class="summary-label">Subject:</span>
@@ -34,7 +34,7 @@
 
         @if (validNextStatuses.length === 0) {
           <div class="terminal-state-banner">
-            This ticket is currently in terminal state <strong>{{ ticket.status }}</strong>. No further status changes are allowed.
+            This ticket is currently in terminal state <strong>{{ ticket.status.replaceAll('_', ' ') }}</strong>. No further status changes are allowed.
           </div>
         } @else {
           <select

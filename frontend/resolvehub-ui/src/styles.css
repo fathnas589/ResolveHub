@@ -797,9 +797,9 @@ input, button, select, textarea {
 }
 
 /* ==========================================================================
-   Tickets table cell polish (scoped to .tickets-table)
+   Tickets table cell polish (scoped to .ops-tickets-table)
    ========================================================================== */
-.tickets-table .ticket-code {
+.ops-tickets-table .ticket-code {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.75rem;
   font-weight: 600;
@@ -810,9 +810,9 @@ input, button, select, textarea {
   border-radius: var(--radius-sm);
   white-space: nowrap;
 }
-.tickets-table .td-subject { min-width: 200px; max-width: 260px; }
-.tickets-table .subject-cell { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
-.tickets-table .subject-text {
+.ops-tickets-table .td-subject { min-width: 190px; max-width: 240px; }
+.ops-tickets-table .subject-cell { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.ops-tickets-table .subject-text {
   font-weight: 600;
   font-size: 0.875rem;
   color: var(--text-primary);
@@ -820,21 +820,21 @@ input, button, select, textarea {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tickets-table .category-subtext {
+.ops-tickets-table .category-subtext {
   font-size: 0.75rem;
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tickets-table .td-dept { min-width: 120px; line-height: 1.35; }
-.tickets-table .td-type,
-.tickets-table .td-updated,
-.tickets-table .td-sla,
-.tickets-table .td-assignee { white-space: nowrap; }
-.tickets-table .dept-text { color: var(--text-secondary); }
-.tickets-table .date-text { color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.tickets-table .badge-type {
+.ops-tickets-table .td-dept { min-width: 120px; line-height: 1.35; }
+.ops-tickets-table .td-type,
+.ops-tickets-table .td-updated,
+.ops-tickets-table .td-sla,
+.ops-tickets-table .td-assignee { white-space: nowrap; }
+.ops-tickets-table .dept-text { color: var(--text-secondary); }
+.ops-tickets-table .date-text { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.ops-tickets-table .badge-type {
   display: inline-flex;
   align-items: center;
   padding: 0.2rem 0.55rem;
@@ -845,9 +845,9 @@ input, button, select, textarea {
   color: var(--neutral-text);
   border: 1px solid var(--neutral-border);
 }
-.tickets-table .badge-type[data-type="COMPLAINT"] { background: rgba(255, 82, 104, 0.08); color: #ff8a98; border-color: rgba(255, 82, 104, 0.25); }
-.tickets-table .badge-type[data-type="SERVICE_REQUEST"] { background: rgba(137, 85, 246, 0.1); color: #a98bff; border-color: rgba(137, 85, 246, 0.28); }
-.tickets-table .badge-sla {
+.ops-tickets-table .badge-type[data-type="COMPLAINT"] { background: rgba(255, 82, 104, 0.08); color: #ff8a98; border-color: rgba(255, 82, 104, 0.25); }
+.ops-tickets-table .badge-type[data-type="SERVICE_REQUEST"] { background: rgba(137, 85, 246, 0.1); color: #a98bff; border-color: rgba(137, 85, 246, 0.28); }
+.ops-tickets-table .badge-sla {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -860,20 +860,20 @@ input, button, select, textarea {
   color: var(--neutral-text);
   border: 1px solid var(--neutral-border);
 }
-.tickets-table .badge-sla .sla-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.tickets-table .badge-sla[data-sla="ON_TRACK"],
-.tickets-table .badge-sla[data-sla="COMPLETED_ON_TIME"] { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
-.tickets-table .badge-sla[data-sla="WARNING"] { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }
-.tickets-table .badge-sla[data-sla="FIRST_RESPONSE_BREACHED"],
-.tickets-table .badge-sla[data-sla="RESOLUTION_BREACHED"] { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-border); }
-.tickets-table .badge-sla[data-sla="WARNING"] .sla-dot,
-.tickets-table .badge-sla[data-sla="FIRST_RESPONSE_BREACHED"] .sla-dot,
-.tickets-table .badge-sla[data-sla="RESOLUTION_BREACHED"] .sla-dot { animation: slaBlink 1.6s infinite; }
-.tickets-table .badge-sla[data-sla="COMPLETED_BREACHED"] { background: rgba(245, 185, 66, 0.08); color: #d9a640; border-color: rgba(245, 185, 66, 0.25); }
-.tickets-table .sla-none { color: var(--text-subtle); }
+.ops-tickets-table .badge-sla .sla-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.ops-tickets-table .badge-sla[data-sla="ON_TRACK"],
+.ops-tickets-table .badge-sla[data-sla="COMPLETED_ON_TIME"] { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+.ops-tickets-table .badge-sla[data-sla="WARNING"] { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }
+.ops-tickets-table .badge-sla[data-sla="FIRST_RESPONSE_BREACHED"],
+.ops-tickets-table .badge-sla[data-sla="RESOLUTION_BREACHED"] { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-border); }
+.ops-tickets-table .badge-sla[data-sla="WARNING"] .sla-dot,
+.ops-tickets-table .badge-sla[data-sla="FIRST_RESPONSE_BREACHED"] .sla-dot,
+.ops-tickets-table .badge-sla[data-sla="RESOLUTION_BREACHED"] .sla-dot { animation: slaBlink 1.6s infinite; }
+.ops-tickets-table .badge-sla[data-sla="COMPLETED_BREACHED"] { background: rgba(245, 185, 66, 0.08); color: #d9a640; border-color: rgba(245, 185, 66, 0.25); }
+.ops-tickets-table .sla-none { color: var(--text-subtle); }
 @keyframes slaBlink { 50% { opacity: 0.35; } }
-.tickets-table .assignee-cell { display: inline-flex; align-items: center; gap: 0.5rem; max-width: 170px; }
-.tickets-table .avatar-xs {
+.ops-tickets-table .assignee-cell { display: inline-flex; align-items: center; gap: 0.5rem; max-width: 170px; }
+.ops-tickets-table .avatar-xs {
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -886,8 +886,8 @@ input, button, select, textarea {
   color: #fff;
   background: linear-gradient(135deg, #8955F6, #3478F6);
 }
-.tickets-table .assignee-name { color: var(--text-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
-.tickets-table .unassigned-text {
+.ops-tickets-table .assignee-name { color: var(--text-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
+.ops-tickets-table .unassigned-text {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -895,7 +895,7 @@ input, button, select, textarea {
   color: var(--text-muted);
   font-style: italic;
 }
-.tickets-table .btn-row-action {
+.ops-tickets-table .btn-row-action {
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -908,10 +908,10 @@ input, button, select, textarea {
   cursor: pointer;
   transition: all var(--transition-fast);
 }
-.tickets-table tbody tr:hover .btn-row-action,
-.tickets-table .btn-row-action:hover { color: var(--primary); border-color: var(--primary-border); background: var(--primary-subtle); }
-.tickets-table tbody tr { box-shadow: inset 3px 0 0 transparent; }
-.tickets-table tbody tr:hover { box-shadow: inset 3px 0 0 var(--primary); }
+.ops-tickets-table tbody tr:hover .btn-row-action,
+.ops-tickets-table .btn-row-action:hover { color: var(--primary); border-color: var(--primary-border); background: var(--primary-subtle); }
+.ops-tickets-table tbody tr { box-shadow: inset 3px 0 0 transparent; }
+.ops-tickets-table tbody tr:hover { box-shadow: inset 3px 0 0 var(--primary); }
 
 /* Light theme: dashboard/report surfaces that use dark gradients in the dark theme */
 :root[data-theme="light"] .recent-tickets-card,
@@ -920,6 +920,6 @@ input, button, select, textarea {
   border-color: var(--border-color);
   box-shadow: var(--shadow-sm);
 }
-.tickets-table .subject-meta { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
-.tickets-table .subject-meta .badge-type { padding: 0.1rem 0.45rem; font-size: 0.625rem; flex-shrink: 0; }
-.tickets-table .td-subject { max-width: 280px; }
+.ops-tickets-table .subject-meta { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.ops-tickets-table .subject-meta .badge-type { padding: 0.1rem 0.45rem; font-size: 0.625rem; flex-shrink: 0; }
+.ops-tickets-table .td-subject { max-width: 240px; }

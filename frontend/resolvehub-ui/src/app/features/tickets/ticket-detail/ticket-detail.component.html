@@ -80,7 +80,7 @@
         <!-- Ticket Information Card -->
         <div class="ticket-overview-card">
           <div class="overview-badges">
-            <span class="status-badge" [attr.data-status]="ticket.status">{{ ticket.status }}</span>
+            <span class="status-badge" [attr.data-status]="ticket.status">{{ ticket.status.replaceAll('_', ' ') }}</span>
             <span class="priority-badge" [attr.data-priority]="ticket.priority">{{ ticket.priority }} Priority</span>
             <span class="created-meta">Created {{ ticket.created | date:'medium' }}</span>
           </div>

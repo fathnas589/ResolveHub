@@ -64,6 +64,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     } else if (cleanUrl.includes('user/profile')) {
       this.currentSection.set('Account');
       this.currentPageTitle.set('My Profile');
+    } else if (cleanUrl.includes('user/dashboard')) {
+      this.currentSection.set('Help Center');
+      this.currentPageTitle.set('My Dashboard');
     } else if (cleanUrl.includes('dashboard')) {
       this.currentSection.set('Analytics');
       this.currentPageTitle.set('Overview Dashboard');

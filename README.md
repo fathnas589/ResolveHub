@@ -6,10 +6,24 @@ ResolveHub is a full-stack service desk platform that helps organisations manage
 
 ![ResolveHub sign-in](docs/screenshots/login.png)
 
-<!-- After seeding demo data (see "Demo data" below), add more screenshots, e.g.:
-![Dashboard](docs/screenshots/dashboard.png)
-![Tickets](docs/screenshots/tickets.png)
--->
+### ✨ AI-assisted triage (employee portal)
+Describe the issue, click **Suggest with AI**, and the department, category, priority and type are filled in for review.
+
+![AI triage on the Raise Request form](docs/screenshots/user-ai-triage.png)
+
+### Admin & agent workspace
+| Operations & SLA dashboard | Ticket queue |
+|---|---|
+| ![Admin dashboard](docs/screenshots/admin-dashboard.png) | ![Ticket list](docs/screenshots/admin-tickets.png) |
+| **Ticket detail with live SLA timers** | **SLA analytics & reports** |
+| ![Ticket detail](docs/screenshots/admin-ticket-detail.png) | ![Reports](docs/screenshots/admin-reports.png) |
+| **SLA policy management** | **Light theme** |
+| ![SLA policies](docs/screenshots/admin-sla-policies.png) | ![Light theme dashboard](docs/screenshots/admin-dashboard-light.png) |
+
+### Employee portal
+| My dashboard | My requests |
+|---|---|
+| ![Employee dashboard](docs/screenshots/user-dashboard.png) | ![My requests](docs/screenshots/user-my-requests.png) |
 
 ---
 

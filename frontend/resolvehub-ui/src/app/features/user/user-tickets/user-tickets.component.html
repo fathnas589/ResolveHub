@@ -146,16 +146,16 @@
                   <span class="subject-title" [title]="t.subject">{{ t.subject }}</span>
                 </td>
                 <td>
-                  <span class="type-pill" [attr.data-type]="t.ticketType">{{ t.ticketType }}</span>
+                  <span class="type-pill" [attr.data-type]="t.ticketType">{{ t.ticketType === 'SERVICE_REQUEST' ? 'Request' : 'Complaint' }}</span>
                 </td>
                 <td class="dept-cat-cell">
                   <span class="dept-text">{{ t.departmentName }}</span>
-                  <span class="cat-text">&bull; {{ t.categoryName }}</span>
+                  <span class="cat-text">{{ t.categoryName }}</span>
                 </td>
                 <td>
                   <span class="status-badge" [ngClass]="getStatusBadgeClass(t.status)">
                     <span class="status-dot"></span>
-                    {{ t.status }}
+                    {{ t.status.replaceAll('_', ' ') }}
                   </span>
                 </td>
                 <td>
@@ -164,7 +164,7 @@
                   </span>
                 </td>
                 <td class="date-cell">
-                  {{ (t.lastUpd || t.created) | date:'mediumDate' }}
+                  {{ (t.lastUpd || t.created) | date:'MMM d' }}
                 </td>
                 <td class="text-right" (click)="$event.stopPropagation()">
                   <button class="action-btn" (click)="openTicketDetails(t.gId)" title="View Ticket Details">
